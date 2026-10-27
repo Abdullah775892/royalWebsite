@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" href="icon-192.png">
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="الأسئلة">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>مولّد الأسئلة والمخططات الهيكلية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--tx:#1d2a2a;--mut:#667;--ac:#0f766e;--acx:#fff;--bd:#dcd9d0;--ok:#15803d;--okb:#dcfce7;--no:#b91c1c;--nob:#fee2e2;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121816;--card:#1c2522;--tx:#e9efed;--mut:#9aa9a5;--ac:#2dd4bf;--acx:#06201c;--bd:#33423e;--ok:#4ade80;--okb:#123a22;--no:#f87171;--nob:#3f1818;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121816;--card:#1c2522;--tx:#e9efed;--mut:#9aa9a5;--ac:#2dd4bf;--acx:#06201c;--bd:#33423e;--ok:#4ade80;--okb:#123a22;--no:#f87171;--nob:#3f1818;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:"Cairo","Segoe UI",Tahoma,Arial,sans-serif;line-height:1.7}
+main{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:1.5rem;margin:8px 0 4px}.sub{color:var(--mut);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:860px){.grid.two{grid-template-columns:1fr 1fr;align-items:start}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px}
+.drop{border:2px dashed var(--bd);border-radius:12px;padding:18px;text-align:center;cursor:pointer;color:var(--mut)}
+.drop.on{border-color:var(--ac);color:var(--tx)}
+textarea,select,input[type=number],input[type=text]{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:9px;font:inherit}
+textarea{min-height:90px;resize:vertical;margin-top:10px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.row>label{flex:1;min-width:130px;font-size:.88rem;color:var(--mut)}
+.hint{font-size:.82rem;color:var(--ac);margin-top:2px;min-height:1.2em}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 14px}
+button.pri{background:var(--ac);color:var(--acx);border-color:var(--ac);font-weight:700;width:100%;margin-top:14px;padding:12px}
+button.danger{background:var(--nob);color:var(--no);border-color:var(--no);font-weight:700}
+button:disabled{opacity:.5;cursor:default}
+.vbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:center;margin-bottom:8px}
+.vbar input{width:70px;text-align:center}
+.cv{overflow:auto;max-height:70vh;border:1px solid var(--bd);border-radius:10px;background:#fff;text-align:center}
+.cv canvas{max-width:100%;height:auto}
+.q h3{margin:0 0 10px;font-size:1.05rem}
+.opt{display:block;width:100%;text-align:start;margin:6px 0}
+.opt.ok{background:var(--okb);border-color:var(--ok)}.opt.no{background:var(--nob);border-color:var(--no)}
+.exp{margin-top:10px;padding:12px;border-radius:10px;background:var(--bg);font-size:.95rem;line-height:1.6}
+.msg{color:var(--mut);text-align:center;padding:8px}.err{color:var(--no)}
+.score{font-weight:700;font-size:1.1rem;text-align:center}
+.chk{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:.9rem}
+[dir=auto]{unicode-bidi:plaintext}
+#set input{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:9px;font:inherit}
+#set summary{cursor:pointer;font-weight:600}
+#set a{color:var(--ac)}
+.st{margin:0 0 10px;background:var(--card);padding:10px;border-radius:8px;border:1px solid var(--bd)}
+.stt{font-weight:700;display:flex;gap:8px;align-items:center;line-height:1.6;color:var(--ac)}
+.num{background:var(--ac);color:var(--acx);border-radius:50%;min-width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;flex:none}
+.eq{direction:ltr;text-align:left;unicode-bidi:isolate;font-family:"Cascadia Code",Consolas,"SF Mono",Menlo,monospace;font-size:.92rem;line-height:1.6;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 10px;margin:5px 0;white-space:pre-wrap;word-break:break-word}
+.note{color:var(--tx);margin:4px 0;font-size:.95rem;line-height:1.6}
+.qtr{color:var(--mut);margin:-2px 0 14px;padding:8px 12px;border-inline-start:3px solid var(--ac);background:var(--bg);border-radius:8px;font-size:.95rem}
+.ans{background:var(--okb);border-inline-start:4px solid var(--ok);border-radius:10px;padding:10px 12px;margin-top:10px}
+.badge{font-size:.75rem;padding:2px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--bd);font-weight:600}
+.badge.easy{color:var(--ok);background:var(--okb)}
+.badge.med{color:#d97706;background:#fef3c7}
+.badge.hard{color:var(--no);background:var(--nob)}
+.checkbox-group{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+.checkbox-group label{font-size:.88rem;display:flex;align-items:center;gap:4px;cursor:pointer}
+.star-btn{cursor:pointer;font-size:1.2rem;background:none;border:none;padding:0;line-height:1}
+.del-btn{cursor:pointer;color:var(--no);background:none;border:none;font-size:1rem;padding:0}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.active{display:flex !important;}
+.modal-content{background:var(--card);border:1px solid var(--bd);width:100%;max-width:800px;max-height:85vh;border-radius:16px;display:flex;flex-direction:column;box-shadow:0 20px 25px -5px rgba(0,0,0,0.3);overflow:hidden}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.modal-body{padding:20px;overflow-y:auto;flex-grow:1}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:8px}
+
+.diagram-box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-top:14px;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1)}
+.diagram-steps{display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:12px;margin-top:14px}
+.diagram-steps.layout-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.diagram-steps.layout-sequential { display: flex; flex-direction: column; gap: 10px; }
+.diagram-steps.layout-split { display: grid; gap: 12px; }
+.diagram-step-card{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:14px;text-align:center;position:relative}
+.diagram-step-num{background:var(--ac);color:var(--acx);width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:bold;margin-bottom:6px}
+
+.pdf-export-container{padding:25px;background:#ffffff;color:#111111;font-family:'Cairo',sans-serif;direction:rtl;text-align:right;}
+.pdf-export-card{border:1px solid #dcd9d0;padding:16px;margin-bottom:16px;border-radius:10px;background:#fff;page-break-inside:avoid;}
+.pdf-export-card h3{margin:0 0 10px;font-size:16px;color:#0f766e;line-height:1.6;}
+.pdf-export-card ul{margin:8px 0;padding-right:20px;padding-left:0;}
+.pdf-export-card li{margin-bottom:4px;font-size:14px;line-height:1.5;}
+.pdf-export-card p{margin:6px 0;font-size:14px;line-height:1.5;}
+</style>
+</head>
+<body>
+<main>
+<h1>📝 مولّد الأسئلة والمخططات الهيكلية بالذكاء الاصطناعي</h1>
+<p class="sub">ارفع ملفك لتوليد الأسئلة، أو استخدم قسم المخططات الهيكلية المستقل أدناه.</p>
+
+<details class="card" id="set"><summary>⚙️ الإعدادات (مفتاح Gemini)</summary>
+<div class="row"><label>مفتاح API<input type="password" id="key" dir="ltr" placeholder="AIza..." autocomplete="off"></label><label>النموذج<input id="model" dir="ltr" value="gemini-flash-latest"></label></div>
+<div class="hint" style="color:var(--mut)"><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">احصل على مفتاح مجاني من Google AI Studio</a> — يُحفظ في متصفحك فقط.</div></details>
+
+<div class="grid two">
+<div>
+  <div class="card">
+    <div class="drop" id="drop">اضغط لرفع ملف أو اسحبه (PDF, DOCX, TXT, MD, CSV)</div>
+    <input type="file" id="file" hidden accept=".pdf,.docx,.txt,.md,.csv">
+    <textarea id="txt" dir="auto" placeholder="أو الصق النص هنا... / or paste text here"></textarea>
+  </div>
+  <div class="card" id="viewer" hidden>
+    <div class="vbar">
+      <button id="prev">◀</button>
+      <span>صفحة <input type="number" id="pg" min="1" value="1"> / <b id="tot">0</b></span>
+      <button id="next">▶</button>
+    </div>
+    <div class="vbar">
+      <button id="setFrom">⏮ ابدأ من هنا</button>
+      <button id="setTo">⏭ انتهِ هنا</button>
+    </div>
+    <div class="cv"><canvas id="cv"></canvas></div>
+  </div>
+</div>
+
+<div>
+  <div class="card">
+    <div class="row" id="rangeRow" style="margin-top:0">
+      <label>من صفحة<input type="number" id="from" min="1" value="1"></label>
+      <label>إلى صفحة<input type="number" id="to" min="1" value="1"></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label>طريقة التوليد
+        <select id="mode"><option value="auto">تلقائي</option><option value="content">أسئلة من المحتوى</option><option value="similar">أسئلة مشابهة للأمثلة والمسائل</option></select>
+      </label>
+    </div>
+
+    <div style="margin-top:12px">
+      <label style="font-size:.88rem;color:var(--mut);display:block;margin-bottom:4px">أنواع الأسئلة المطلوبة (اختر واحدًا أو أكثر):</label>
+      <div class="checkbox-group" id="typesGroup">
+        <label><input type="checkbox" name="qtype" value="mcq" checked> اختيار من متعدد</label>
+        <label><input type="checkbox" name="qtype" value="tf"> صح / خطأ</label>
+        <label><input type="checkbox" name="qtype" value="short"> إجابة قصيرة</label>
+        <label><input type="checkbox" name="qtype" value="problem"> مسائل حسابية</label>
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <label style="font-size:.88rem;color:var(--mut);display:block;margin-bottom:4px">مستويات الصعوبة (اختر واحدًا أو أكثر):</label>
+      <div class="checkbox-group" id="lvlsGroup">
+        <label><input type="checkbox" name="qlvl" value="سهل"> سهل</label>
+        <label><input type="checkbox" name="qlvl" value="متوسط" checked> متوسط</label>
+        <label><input type="checkbox" name="qlvl" value="صعب"> صعب</label>
+      </div>
+    </div>
+
+    <div class="hint" id="auto"></div>
+
+    <div class="row">
+      <label>عدد الأسئلة<input type="number" id="n" value="6" min="1" max="30"></label>
+      <label>لغة الأسئلة
+        <select id="lang"><option value="auto">نفس لغة الملف</option><option value="ar">عربي</option><option value="en">English</option><option value="mix">عربي + مصطلحات إنجليزية</option></select>
+      </label>
+    </div>
+
+    <label class="chk" id="imgRow" hidden><input type="checkbox" id="img"> اقرأ الصفحات كصور (للمعادلات والرسومات، حتى 12 صفحة)</label>
+    <label class="chk"><input type="checkbox" id="trG" checked> ترجمة كل سؤال تحته (عربي ⇄ إنجليزي)</label>
+    
+    <button class="pri" id="go">ولّد الأسئلة</button>
+    <button id="stop" hidden style="width:100%;margin-top:8px;color:var(--no);border-color:var(--no)">⏹ إيقاف التوليد</button>
+  </div>
+</div>
+</div>
+
+<div class="card" id="libCard">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+    <h3 style="margin:0">📚 مكتبة الأسئلة المحفوظة (<span id="savedCount">0</span>)</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button id="openLibModal" class="pri" style="margin-top:0;padding:8px 14px">📂 فتح نافذة المحفوظات المستقلة</button>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="border: 2px solid var(--ac);">
+  <h3 style="margin-top:0; color: var(--ac);">📊 قسم توليد المخططات الهيكلية المستقل</h3>
+  <div class="hint" style="color:var(--mut); margin-bottom:12px;">ارفع ملفك أو اكتب التفاصيل بدقة بالمربع النصي لتوليد المخطط الهيكلي بالطريقة والتقسيم الذي تريده.</div>
+  
+  <div class="grid two" style="gap:10px;">
+    <div>
+      <div class="drop" id="diagDrop">اضغط لرفع ملف للمخطط فقط (PDF, DOCX, TXT)</div>
+      <input type="file" id="diagFile" hidden accept=".pdf,.docx,.txt,.md,.csv">
+      
+      <div class="card" id="diagViewer" hidden style="margin-top:10px; padding:10px;">
+        <div class="vbar">
+          <button id="diagPrev">◀</button>
+          <span>صفحة <input type="number" id="diagPg" min="1" value="1"> / <b id="diagTot">0</b></span>
+          <button id="diagNext">▶</button>
+        </div>
+        <div class="cv" style="max-height:40vh;"><canvas id="diagCv"></canvas></div>
+      </div>
+    </div>
+    
+    <div>
+      <div class="row" style="margin-top:0">
+        <label>عدد الأقسام / المستويات:
+          <input type="number" id="diagSectionsCount" value="4" min="2" max="10">
+        </label>
+        <label>عنوان المخطط:
+          <input type="text" id="diagTopicInput" placeholder="مثلاً: مستويات الإبداع">
+        </label>
+      </div>
+
+      <div class="row" style="margin-top:8px;">
+        <label>خيارات تقسيم الأقسام (تتغير تلقائياً حسب العدد):
+          <select id="diagLayoutSelect">
+          </select>
+        </label>
+      </div>
+      
+      <div class="row" id="diagRangeRow" hidden style="margin-top:8px;">
+        <label>من صفحة<input type="number" id="diagFrom" min="1" value="1"></label>
+        <label>إلى صفحة<input type="number" id="diagTo" min="1" value="1"></label>
+      </div>
+    </div>
+  </div>
+
+  <textarea id="diagInstructions" dir="auto" style="min-height:110px; margin-top:12px;" placeholder="اكتب هنا بالضبط ماذا تريد أن يحدث بالمخطط، أو الصق النص المرجعي والملاحظات المخصصة..."></textarea>
+
+  <button class="pri" id="generateDiagramBtn">📈 توليد وعرض المخطط الهيكلي</button>
+  
+  <div id="diagramContainer" hidden></div>
+</div>
+
+<div class="card" id="solveCard">
+  <h3 style="margin:0 0 6px">🧮 حلّ أسئلة من الحافظة</h3>
+  <div class="hint" style="color:var(--mut)">الصق سؤالًا أو أكثر (نص أو صورة) وأحلّها لك خطوة بخطوة.</div>
+  <textarea id="sq" dir="auto" placeholder="الصق الأسئلة هنا... / paste questions here"></textarea>
+
+  <div class="row" style="align-items:center;margin-top:8px">
+    <button id="clip">📋 لصق من الحافظة</button>
+    <button id="clr">🗑 مسح</button>
+    <span id="imgn" style="color:var(--mut)"></span>
+  </div>
+
+  <div class="row" style="margin-top:10px">
+    <label>عمق الشرح المطلوب:
+      <select id="detailLevel">
+        <option value="detailed">شرح مفصل وخطوات واضحة (الوضع القياسي)</option>
+        <option value="very_detailed">شرح بالتفصيل الممل (تفكيك المعادلات وتوضيح كل الملاحظات للمبتدئين)</option>
+      </select>
+    </label>
+  </div>
+
+  <label class="chk"><input type="checkbox" id="trS" checked> ترجمة السؤال تحته (عربي ⇄ إنجليزي)</label>
+  <button class="pri" id="solveBtn">حلّ بالخطوات</button>
+</div>
+
+<div id="out"></div>
+</main>
+
+<div id="libModal" class="modal-overlay">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 style="margin:0">📚 إدارة واستعراض الأسئلة المحفوظة</h3>
+      <button id="closeLibModal" style="padding:6px 12px; font-weight:bold; cursor:pointer;">✕ إغلاق</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+        <button id="modalToggleFav">⭐ عرض المفضلة فقط</button>
+        <button id="modalExportPdf" style="background:var(--okb);color:var(--ok);border-color:var(--ok)">📄 تصدير القائمة إلى PDF مرتب</button>
+        <button id="modalClearLib" style="color:var(--no);border-color:var(--no)">🗑 مسح كافة المحفوظات</button>
+      </div>
+      <div id="modalLibList"></div>
+    </div>
+    <div class="modal-footer">
+      <span style="font-size:0.85rem; color:var(--mut);">إجمالي العناصر في المكتبة: <b id="modalLibCount">0</b></span>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const out=$('out'),txt=$('txt'),drop=$('drop');
+let ctl=null,pdf=null,N=0,cur=1,sug={type:'mcq',mode:'content'},gen=0;
+let modalFilterFav=false;
+let lastGeneratedQuestions = [];
+
+let diagPdf=null, diagN=0, diagCur=1, diagExtractedText='';
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
+const b64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(b)});
+const E=(code,message,text)=>({code,message,text});
+$('key').value=localStorage.getItem('gk')||'';$('model').value=localStorage.getItem('gm')||'gemini-flash-latest';
+$('key').onchange=()=>localStorage.setItem('gk',$('key').value.trim());
+$('model').onchange=()=>localStorage.setItem('gm',$('model').value.trim());
+if(!$('key').value)$('set').open=true;
+
+const sample={
+  limits:async()=>({images:{maxCount:10}}),
+  json:async(prompt,o={})=>{
+    const key=$('key').value.trim(),model=$('model').value.trim()||'gemini-flash-latest';
+    if(!key)throw E('no_key','');
+    const parts=[{text:prompt}];
+    for(const b of(o.images||[]))parts.push({inline_data:{mime_type:b.type||'image/jpeg',data:await b64(b)}});
+    const body=JSON.stringify({contents:[{role:'user',parts}],generationConfig:{responseMimeType:'application/json',temperature:.7,maxOutputTokens:8192}});
+    const wait=ms=>new Promise((res,rej)=>{const t=setTimeout(res,ms);if(o.signal)o.signal.addEventListener('abort',()=>{clearTimeout(t);rej(E('cancelled',''))},{once:true})});
+    const models=[model];if(!/lite/.test(model))models.push('gemini-flash-lite-latest');
+    let r,j;
+    for(const m of models){
+      for(let a=0;a<3;a++){
+        try{r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(m)+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},signal:o.signal,body})}
+        catch(e){throw E(e&&e.name==='AbortError'?'cancelled':'network',String(e&&e.message||e))}
+        j=await r.json().catch(()=>({}));
+        if(r.ok||![500,503,504].includes(r.status))break;
+        if(a<2){if(o.status)o.status('النموذج مشغول ('+m+')، إعادة المحاولة '+(a+1)+'/2...');await wait(a?7000:3000)}
+      }
+      if(r.ok||![500,503,504].includes(r.status))break;
+      if(m!==models[models.length-1]&&o.status)o.status('النموذج مشغول، التحويل إلى '+models[models.length-1]+'...');
+    }
+    if(!r.ok)throw E(r.status===429?'rate_limited':[400,401,403].includes(r.status)?'bad_key':r.status===404?'bad_model':'upstream_error',(j.error&&j.error.message)||('HTTP '+r.status));
+    const t=((((j.candidates||[])[0]||{}).content||{}).parts||[]).map(p=>p.text||'').join('');
+    if(!t.trim())throw E('empty_completion','');
+    try{return JSON.parse(t)}catch(e){throw E('invalid_json','',t)}
+  }
+};
+
+$('drop').onclick=()=>$('file').click();
+drop.ondragover=e=>{e.preventDefault();drop.classList.add('on')};
+drop.ondragleave=()=>drop.classList.remove('on');
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove('on');if(e.dataTransfer.files[0])load(e.dataTransfer.files[0])};
+$('file').onchange=()=>$('file').files[0]&&load($('file').files[0]);
+
+async function load(f){
+  drop.textContent='⏳ جاري قراءة '+f.name+'...';
+  pdf=null;N=0;$('viewer').hidden=true;$('imgRow').hidden=true;$('rangeRow').hidden=true;
+  try{
+    const ext=f.name.split('.').pop().toLowerCase();
+    if(ext==='pdf'){
+      pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+      pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer(),disableFontFace:true}).promise;N=pdf.numPages;
+      txt.value='';txt.placeholder='تم تحميل الملف ('+N+' صفحة). النص يُستخرج من الصفحات المحددة عند التوليد.';
+      $('viewer').hidden=false;$('imgRow').hidden=false;$('rangeRow').hidden=false;
+      
+      $('tot').textContent=N;$('pg').max=N;$('from').max=N;$('to').max=N;
+      $('from').value=1;
+      $('to').value=N;
+      
+      cur=1;await show(1);
+    }else{
+      const t=ext==='docx'?(await mammoth.extractRawText({arrayBuffer:await f.arrayBuffer()})).value:await f.text();
+      if(!t.trim())throw 0;txt.value=t.trim();
+    }
+    drop.textContent='✅ '+f.name+(N?' ('+N+' صفحة)':'')+' — اضغط لتغيير الملف';
+    detect();
+  }catch(e){drop.textContent='⚠️ ما قدرت أقرأ الملف. جرب ملف ثاني أو الصق النص.'}
+}
+
+async function show(p){
+  if(!pdf)return;p=Math.min(N,Math.max(1,p|0||1));cur=p;$('pg').value=p;
+  const t=++gen,page=await pdf.getPage(p),vp=page.getViewport({scale:1.4}),c=$('cv');
+  c.width=vp.width;c.height=vp.height;
+  await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+}
+$('stop').onclick=()=>{if(ctl)ctl.abort();$('stop').hidden=true;};
+$('prev').onclick=()=>show(cur-1);$('next').onclick=()=>show(cur+1);
+$('pg').onchange=()=>show(+$('pg').value);
+$('setFrom').onclick=()=>{$('from').value=cur;if(+$('to').value<cur)$('to').value=cur;detect()};
+$('setTo').onclick=()=>{$('to').value=cur;if(+$('from').value>cur)$('from').value=cur;detect()};
+$('from').onchange=$('to').onchange=detect;
+
+function range(){let a=Math.max(1,+$('from').value||1),b=Math.min(N,+$('to').value||a);if(b<a)[a,b]=[b,a];return[a,b]}
+async function getText(){
+  if(txt.value.trim())return txt.value.trim();
+  if(!pdf)return '';
+  const[a,b]=range();let t='';
+  for(let i=a;i<=b;i++){const c=await(await pdf.getPage(i)).getTextContent();t+=`\n[صفحة ${i}]\n`+c.items.map(x=>x.str).join(' ')}
+  return t;
+}
+
+async function detect(){
+  let t='';try{t=pdf&&!txt.value.trim()?(await getText()).slice(0,12000):txt.value.slice(0,12000)}catch(e){}
+  if(!t.trim()){$('auto').textContent='';return}
+  const math=(t.match(/[=+\-×÷√∑∫≤≥π^]|\d+\s?(mm|cm|m|kN|MPa|kg|N|Pa|°C|V|A|Ω|Hz|W|psi|ksi)\b/g)||[]).length/(t.length/1000);
+  const ex=/(example|solution|problem|exercise|given|find|determine|مثال|الحل|مسألة|تمرين|المعطيات|احسب|أوجد)/gi;
+  const exN=(t.match(ex)||[]).length;
+  const eng=math>8||exN>=4;
+  sug={mode:exN>=3?'similar':'content'};
+  const mn={similar:'مشابهة للأمثلة',content:'من المحتوى'}[sug.mode];
+  $('auto').textContent='الاقتراح التلقائي: '+(eng?'يبدو مرجعًا هندسيًا/حسابيًا — ':'')+' ('+mn+')';
+}
+txt.oninput=detect;
+
+function updateDiagramLayoutOptions() {
+  const count = parseInt($('diagSectionsCount').value) || 4;
+  const select = $('diagLayoutSelect');
+  select.innerHTML = '';
+
+  const autoOpt = document.createElement('option');
+  autoOpt.value = 'auto';
+  autoOpt.textContent = 'تلقائي (حسب محتوى المخطط)';
+  select.appendChild(autoOpt);
+
+  for (let top = 1; top < count; top++) {
+    let bottom = count - top;
+    const opt = document.createElement('option');
+    opt.value = `${top}_top_${bottom}_bottom`;
+    opt.textContent = `${top} فوق و ${bottom} تحت (${top} فوق / ${bottom} تحت)`;
+    if (top === Math.floor(count / 2) && bottom === Math.ceil(count / 2)) {
+      opt.selected = true;
+    }
+    select.appendChild(opt);
+  }
+
+  const seqOpt = document.createElement('option');
+  seqOpt.value = 'sequential';
+  let seqStr = Array(count).fill('1').join('-');
+  seqOpt.textContent = `واحد فوق وواحد تحت بالتسلسل (عمودي ${seqStr})`;
+  select.appendChild(seqOpt);
+
+  const gridOpt = document.createElement('option');
+  gridOpt.value = 'grid';
+  gridOpt.textContent = `عرض الكل بجانب بعض (الأربع/الكافة متجاورين)`;
+  select.appendChild(gridOpt);
+
+  const customOpt = document.createElement('option');
+  customOpt.value = 'custom';
+  customOpt.textContent = 'ترتيب مخصص (حسب التعليمات النصية)';
+  select.appendChild(customOpt);
+}
+
+$('diagSectionsCount').addEventListener('input', updateDiagramLayoutOptions);
+updateDiagramLayoutOptions();
+
+$('diagDrop').onclick=()=>$('diagFile').click();
+$('diagDrop').ondragover=e=>{e.preventDefault();$('diagDrop').classList.add('on')};
+$('diagDrop').ondragleave=()=>$('diagDrop').classList.remove('on');
+$('diagDrop').ondrop=e=>{e.preventDefault();$('diagDrop').classList.remove('on');if(e.dataTransfer.files[0])loadDiagFile(e.dataTransfer.files[0])};
+$('diagFile').onchange=()=>$('diagFile').files[0]&&loadDiagFile($('diagFile').files[0]);
+
+async function loadDiagFile(f){
+  $('diagDrop').textContent='⏳ جاري قراءة '+f.name+'...';
+  diagPdf=null; diagN=0; diagExtractedText='';
+  $('diagViewer').hidden=true; $('diagRangeRow').hidden=true;
+  
+  try{
+    const ext=f.name.split('.').pop().toLowerCase();
+    if(ext==='pdf'){
+      pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+      diagPdf=await pdfjsLib.getDocument({data:await f.arrayBuffer(),disableFontFace:true}).promise;
+      diagN=diagPdf.numPages;
+      $('diagViewer').hidden=false; $('diagRangeRow').hidden=false;
+      
+      $('diagTot').textContent=diagN; $('diagPg').max=diagN; $('diagFrom').max=diagN; $('diagTo').max=diagN;
+      $('diagFrom').value=1; 
+      $('diagTo').value=diagN;
+      
+      diagCur=1; await showDiagPage(1);
+    }else{
+      diagExtractedText=ext==='docx'?(await mammoth.extractRawText({arrayBuffer:await f.arrayBuffer()})).value:await f.text();
+    }
+    $('diagDrop').textContent='✅ '+f.name+(diagN?' ('+diagN+' صفحة)':'')+' — اضغط لتغيير الملف';
+  }catch(e){
+    $('diagDrop').textContent='⚠️ تعذر قراءة الملف. يرجى تجربة ملف آخر.';
+  }
+}
+
+async function showDiagPage(p){
+  if(!diagPdf)return; p=Math.min(diagN,Math.max(1,p|0||1)); diagCur=p; $('diagPg').value=p;
+  const page=await diagPdf.getPage(p), vp=page.getViewport({scale:1.2}), c=$('diagCv');
+  c.width=vp.width; c.height=vp.height;
+  await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+}
+$('diagPrev').onclick=()=>showDiagPage(diagCur-1);
+$('diagNext').onclick=()=>showDiagPage(diagCur+1);
+$('diagPg').onchange=()=>showDiagPage(+$('diagPg').value);
+
+async function getDiagText(){
+  if(diagExtractedText) return diagExtractedText;
+  if(!diagPdf) return '';
+  let a = Math.max(1, +$('diagFrom').value || 1), b = Math.min(diagN, +$('diagTo').value || a);
+  if(b < a) [a, b] = [b, a];
+  let t = '';
+  for(let i = a; i <= b; i++){
+    const c = await(await diagPdf.getPage(i)).getTextContent();
+    t += `\n[صفحة ${i}]\n` + c.items.map(x => x.str).join(' ');
+  }
+  return t;
+}
+
+function hideModal(){ $('libModal').classList.remove('active'); }
+function showModal(){ $('libModal').classList.add('active'); }
+
+$('closeLibModal').onclick = hideModal;
+$('libModal').onclick = hideModal;
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') hideModal();
+});
+
+function getSavedLib(){
+  try{return JSON.parse(localStorage.getItem('saved_qs')||'[]')}catch(e){return []}
+}
+function setSavedLib(lib){
+  localStorage.setItem('saved_qs',JSON.stringify(lib));
+  updateSavedCount();
+}
+function updateSavedCount(){
+  $('savedCount').textContent=getSavedLib().length;
+}
+updateSavedCount();
+
+function saveSelectedQuestions(selectedIds){
+  const lib = getSavedLib();
+  let count = 0;
+  lastGeneratedQuestions.forEach(q=>{
+    if(selectedIds.includes(q.id)){
+      if(!lib.some(x=>x.q===q.q)){
+        lib.push(q);
+        count++;
+      }
+    }
+  });
+  setSavedLib(lib);
+  return count;
+}
+
+function toggleStar(qId){
+  const lib=getSavedLib();
+  const item=lib.find(x=>x.id===qId);
+  if(item){
+    item.starred = !item.starred;
+    setSavedLib(lib);
+    renderModalLib();
+  }
+}
+
+function deleteModalQuestion(qId){
+  if(confirm('هل تريد حذف هذا السؤال من المحفوظات؟')){
+    let lib=getSavedLib();
+    lib=lib.filter(x=>x.id!==qId);
+    setSavedLib(lib);
+    renderModalLib();
+  }
+}
+
+function renderModalLib(){
+  const lib=getSavedLib();
+  const list = modalFilterFav ? lib.filter(x=>x.starred) : lib;
+  $('modalLibCount').textContent = lib.length;
+  
+  const container = $('modalLibList');
+  if(!list.length){
+    container.innerHTML = '<div class="msg">لا توجد أسئلة محفوظة أو مطابقة للفلاتر.</div>';
+    return;
+  }
+  
+  container.innerHTML = '';
+  list.forEach((q,i)=>{
+    const card=document.createElement('div');
+    card.className='card q';
+    card.style.marginBottom='10px';
+    
+    const head=document.createElement('div');
+    head.style.display='flex';head.style.justifyContent='space-between';head.style.alignItems='flex-start';head.style.gap='10px';
+    
+    const title=el('h3','',(i+1)+'. '+q.q);
+    title.style.flex='1';
+    head.appendChild(title);
+    
+    const acts=document.createElement('div');
+    acts.style.display='flex';acts.style.alignItems='center';acts.style.gap='8px';
+    
+    if(q.difficulty){
+      const badge=document.createElement('span');
+      badge.className='badge '+(q.difficulty==='سهل'?'easy':q.difficulty==='صعب'?'hard':'med');
+      badge.textContent=q.difficulty;
+      acts.appendChild(badge);
+    }
+    
+    const starBtn=document.createElement('button');
+    starBtn.className='star-btn';
+    starBtn.innerHTML=q.starred ? '⭐' : '☆';
+    starBtn.onclick=()=>toggleStar(q.id);
+    acts.appendChild(starBtn);
+    
+    const delBtn=document.createElement('button');
+    delBtn.className='del-btn';
+    delBtn.innerHTML='🗑️';
+    delBtn.onclick=()=>deleteModalQuestion(q.id);
+    acts.appendChild(delBtn);
+    
+    head.appendChild(acts);
+    card.appendChild(head);
+    
+    if(q.q_tr) card.appendChild(trEl(q.q_tr));
+    
+    if(q.type==='mcq' && Array.isArray(q.options)){
+      const ul=document.createElement('ul');
+      ul.style.margin='6px 0';ul.style.paddingInlineStart='20px';
+      q.options.forEach((opt,idx)=>{
+        const li=document.createElement('li');
+        li.textContent=opt;
+        if(idx===q.answer) { li.style.fontWeight='bold'; li.style.color='var(--ok)'; li.textContent+=' ✓ (الإجابة الصحيحة)'; }
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
+    }else if(q.type==='tf'){
+      const isTrue = q.answer === true || q.answer === 0 || String(q.answer).toLowerCase() === 'true' || String(q.answer).trim() === 'صح';
+      const p=document.createElement('p');
+      p.innerHTML='<strong>الإجابة:</strong> '+(isTrue ? 'صح (True) ✓':'خطأ (False) ✗');
+      card.appendChild(p);
+    }else if(q.answer){
+      const p=document.createElement('p');
+      p.innerHTML='<strong>الإجابة/الحل:</strong> '+q.answer;
+      card.appendChild(p);
+    }
+    
+    container.appendChild(card);
+  });
+}
+
+$('openLibModal').onclick=()=>{
+  modalFilterFav=false;
+  $('modalToggleFav').textContent="⭐ عرض المفضلة فقط";
+  renderModalLib();
+  showModal();
+};
+
+$('modalToggleFav').onclick=()=>{
+  modalFilterFav = !modalFilterFav;
+  $('modalToggleFav').textContent = modalFilterFav ? "📋 عرض الكل" : "⭐ عرض المفضلة فقط";
+  renderModalLib();
+};
+
+$('modalClearLib').onclick=()=>{
+  if(confirm('هل أنت متأكد من مسح كافة المحفوظات؟')){
+    localStorage.removeItem('saved_qs');
+    updateSavedCount();
+    renderModalLib();
+  }
+};
+
+$('modalExportPdf').onclick=()=>{
+  const lib=getSavedLib();
+  const list = modalFilterFav ? lib.filter(x=>x.starred) : lib;
+  if(!list.length){ alert('لا توجد أسئلة للتصدير!'); return; }
+  
+  let html=`<div class="pdf-export-container">
+    <h2 style="text-align:center;margin-bottom:20px;color:#0f766e;font-size:20px;">📚 قائمة الأسئلة المحفوظة</h2>`;
+  list.forEach((q,i)=>{
+    html+=`<div class="pdf-export-card"><h3>${i+1}. ${q.q}</h3>`;
+    if(q.q_tr) html+=`<p style="color:#555;font-size:13px;margin-bottom:6px;">${q.q_tr}</p>`;
+    if(q.type==='mcq' && Array.isArray(q.options)){
+      html+=`<ul>`;
+      q.options.forEach((opt,idx)=>{
+        html+=`<li style="${idx===q.answer?'font-weight:bold;color:#15803d':''}">${opt} ${idx===q.answer?'✓':''}</li>`;
+      });
+      html+=`</ul>`;
+    }else if(q.type==='tf'){
+      const isTrue = q.answer === true || q.answer === 0 || String(q.answer).toLowerCase() === 'true' || String(q.answer).trim() === 'صح';
+      html+=`<p><strong>الإجابة:</strong> ${isTrue ? 'صح (True)' : 'خطأ (False)'}</p>`;
+    }else if(q.answer){
+      html+=`<p><strong>الإجابة/الحل:</strong> ${q.answer}</p>`;
+    }
+    html+=`</div>`;
+  });
+  html+=`</div>`;
+
+  const opt = { 
+    margin: [10, 10, 10, 10], 
+    filename: 'الأسئلة_المحفوظة.pdf', 
+    image: { type: 'jpeg', quality: 0.98 }, 
+    html2canvas: { scale: 2, useCORS: true }, 
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+  };
+  html2pdf().set(opt).from(html).save();
+};
+
+$('generateDiagramBtn').onclick=async()=>{
+  const btn=$('generateDiagramBtn');
+  const count = parseInt($('diagSectionsCount').value)||4;
+  const topic = $('diagTopicInput').value.trim();
+  const userInstructions = $('diagInstructions').value.trim();
+  const layoutChoice = $('diagLayoutSelect').value;
+  const container = $('diagramContainer');
+  
+  if(!$('key').value.trim()){$('set').open=true;alert('ضع مفتاح Gemini في الإعدادات أولًا.');return}
+  
+  btn.disabled=true;
+  container.hidden=false;
+  container.innerHTML='<div class="msg">⏳ جاري توليد المخطط الهيكلي وتوزيع الأقسام...</div>';
+  
+  try{
+    const fileContent = await getDiagText();
+    
+    let layoutInstructionText = '';
+    let topCount = 0, bottomCount = 0;
+
+    if (layoutChoice.includes('_top_')) {
+      const parts = layoutChoice.split('_top_');
+      topCount = parseInt(parts[0]);
+      bottomCount = parseInt(parts[1]);
+      layoutInstructionText = `رتب الأقسام بحيث يكون هناك بالضبط ${topCount} أقسام في الصف الأعلى و ${bottomCount} أقسام في الصف الأسفل.`;
+    } else if (layoutChoice === 'sequential') {
+      layoutInstructionText = 'رتب الأقسام بشكل تسلسلي عمودي متتابع، قسم واحد تحت الآخر (1 فوق ثم التالي تحته وهكذا).';
+    } else if (layoutChoice === 'grid') {
+      layoutInstructionText = 'رتب الأقسام كاملة جنب بعض في صف واحد متجاور.';
+    } else {
+      layoutInstructionText = 'اختر الترتيب والتوزيع الهيكلي الأمثل بحسب النص والتعليمات.';
+    }
+
+    const prompt=`أنت أستاذ أكاديمي ومصمم مخططات خبير. قم بتوليد مخطط هيكلي مكون بالضبط من ${count} أقسام رئيسية${topic?' حول موضوع: '+topic:''}.
+نمط الترتيب المطلوب: ${layoutInstructionText}
+
+اتبع الملاحظات والتعليمات المخصصة التالية بدقة:
+"""
+${userInstructions}
+"""
+
+المحتوى المرجعي المرفق لهذا المخطط (إن وجد):
+"""
+${fileContent.slice(0, 15000)}
+"""
+
+أعد الناتج بصيغة JSON حصراً بالهيكل التالي:
+{
+  "title": "عنوان المخطط الهيكلي",
+  "sections": [
+    {"step": 1, "name": "اسم القسم أو المستوى الأول", "description": "وصف قصير ومحدد جداً"},
+    {"step": 2, "name": "اسم القسم الثاني", "description": "وصف قصير"}
+  ]
+}`;
+
+    const res = await sample.json(prompt);
+    if(!res || !res.sections) throw new Error('فشل توليد هيكل المخطط');
+    
+    let cssLayoutClass = 'layout-grid';
+    let inlineGridStyle = '';
+
+    if (layoutChoice.includes('_top_')) {
+      cssLayoutClass = 'layout-split';
+      inlineGridStyle = `grid-template-columns: repeat(${Math.max(topCount, bottomCount)}, 1fr);`;
+    } else if (layoutChoice === 'sequential') {
+      cssLayoutClass = 'layout-sequential';
+    }
+
+    let diagHTML = `
+      <div class="diagram-box" id="captureDiagramArea">
+        <h3 style="margin-top:0; color:var(--ac); text-align:center;">📊 ${res.title || topic || 'المخطط الهيكلي'}</h3>
+        <div class="diagram-steps ${cssLayoutClass}" style="${inlineGridStyle}">
+    `;
+    
+    res.sections.forEach((sec, idx) => {
+      let cardExtraStyle = '';
+      diagHTML+=`
+        <div class="diagram-step-card" style="${cardExtraStyle}">
+          <div class="diagram-step-num">${sec.step}</div>
+          <div style="font-weight:bold; margin-bottom:4px;">${sec.name}</div>
+          <div style="font-size:0.85rem; color:var(--mut);">${sec.description}</div>
+        </div>
+      `;
+    });
+    
+    diagHTML+=`
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+        <button id="downloadDiagramImgBtn" style="background:var(--okb); color:var(--ok); border-color:var(--ok)">📥 تحميل المخطط كصورة (PNG)</button>
+        <button id="copyDiagramImgBtn" style="background:var(--card); color:var(--tx)">📋 نسخ المخطط كصورة</button>
+      </div>
+    `;
+    
+    container.innerHTML = diagHTML;
+    
+    $('downloadDiagramImgBtn').onclick = () => {
+      const area = $('captureDiagramArea');
+      html2canvas(area, { scale: 2, useCORS: true }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'Diagram_Structure.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    };
+
+    $('copyDiagramImgBtn').onclick = () => {
+      const area = $('captureDiagramArea');
+      html2canvas(area, { scale: 2, useCORS: true }).then(async canvas => {
+        try {
+          canvas.toBlob(async blob => {
+            await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+            alert('✅ تم نسخ صورة المخطط الهيكلي إلى الحافظة بنجاح!');
+          });
+        } catch (err) {
+          alert('⚠️ تعذر النسخ المباشر للحافظة في متصفحك، استخدم خيار "تحميل المخطط كصورة" بدلاً من ذلك.');
+        }
+      });
+    };
+    
+  }catch(e){
+    container.innerHTML='<div class="msg err">حدث خطأ أثناء توليد المخطط الهيكلي. تأكد من المفتاح والنص والتعليمات المدخلة.</div>';
+  }finally{
+    btn.disabled=false;
+  }
+};
+
+$('go').onclick=async()=>{
+  const btn=$('go');btn.disabled=true;ctl=new AbortController();$('stop').hidden=false;
+  out.innerHTML='<div class="msg">⏳ جاري التحضير...</div>';
+  try{
+    if(!$('key').value.trim()){$('set').open=true;out.innerHTML='<div class="msg err">ضع مفتاح Gemini في الإعدادات أولًا.</div>';return}
+    localStorage.setItem('gk',$('key').value.trim());localStorage.setItem('gm',$('model').value.trim());
+    
+    const selectedTypes=[...document.querySelectorAll('input[name="qtype"]:checked')].map(x=>x.value);
+    if(!selectedTypes.length){out.innerHTML='<div class="msg err">اختر نوع سؤال واحد على الأقل.</div>';return}
+    
+    const selectedLvls=[...document.querySelectorAll('input[name="qlvl"]:checked')].map(x=>x.value);
+    if(!selectedLvls.length){out.innerHTML='<div class="msg err">اختر مستوى صعوبة واحد على الأقل.</div>';return}
+
+    const useImg=$('img').checked&&pdf&&!txt.value.trim();
+    let text='',groups=[];
+    if(useImg){
+      const lim=await sample.limits().catch(()=>({}));
+      if(!lim.images){out.innerHTML='<div class="msg err">قراءة الصور غير متاحة لحسابك، ألغِ الخيار.</div>';return}
+      const[a,b]=range(),mx=lim.images.maxCount||4,pages=[];
+      for(let i=a;i<=Math.min(b,a+11);i++)pages.push(i);
+      for(let i=0;i<pages.length;i+=mx)groups.push(pages.slice(i,i+mx));
+    }else{
+      text=await getText();
+      if(text.length<50){out.innerHTML='<div class="msg err">ارفع ملف أو الصق نص أطول.</div>';return}
+    }
+    out.innerHTML='<div class="msg">⏳ الذكاء الاصطناعي يجهز الأسئلة...</div>';
+    
+    const mode=$('mode').value==='auto'?sug.mode:$('mode').value;
+    const n=Math.min(30,Math.max(1,+$('n').value||6));
+
+    const M=mode==='similar'?'الأسئلة تشبه الأمثلة والمسائل: نفس الفكرة مع تغيير الأرقام.':'الأسئلة تغطي المفاهيم والقوانين والحقائق بدقة.';
+    const L={auto:'اكتب بلغة المحتوى.',ar:'اكتب بالعربية.',en:'Write in English.',mix:'عربي ومصطلحات إنجليزية.'}[$('lang').value];
+
+    const mk=n=>`أنت أستاذ محترف وخبير. اكتب ${n} أسئلة موزعة على الأنواع: [${selectedTypes.join(', ')}] والمستويات: [${selectedLvls.join(', ')}].
+لكل سؤال حدد type و difficulty (سهل, متوسط, صعب). ${M} ${L}
+
+قواعد الشرح للأسئلة:
+- بالنسبة للأسئلة النظرية (mcq أو tf): اكتب الشرح بأسلوب مباشر وموجز في حقل explanation كنص عادي أو فقرة واحدة توضح السبب بوضوح ودون تقسيم إلى (الخطوة 1، الخطوة 2).
+- بالنسبة للمسائل الحسابية (problem): يمكنك كتابة حقل explanation كخطوات مرقمة ومفصلة.
+
+تنبيه بخصوص أسئلة الصح والخطأ (tf):
+- "answer": true (إذا كانت العبارة صحيحة)، أو false (إذا كانت العبارة خاطئة).
+- الشرح يجب أن يطابق الإجابة تماماً وبدون أي تعارض.
+
+أعد JSON فقط (مصفوفة ضمن مفتاح questions) بدون أي نصوص خارجية:
+{
+  "questions": [
+    {
+      "type":"mcq",
+      "difficulty":"سهل",
+      "q":"ما هو التعريف الدقيق لريادة الأعمال؟",
+      "options":["إدارة المشروعات العامة", "إنشاء مشروع اقتصادي أو الاجتماعي مبدع", "تكرار المشاريع التقليدية", "الاستثمار في الأسهم"],
+      "answer": 1,
+      "explanation": "يقوم المشروع الريادي على فكرة خلاقة وتقديم منتج أو خدمة جديدة والعمل تحت مخاطرة مدروسة وظروف عدم يقين."
+    }
+  ]
+}
+${$('trG').checked?'أضف حقل "q_tr" للترجمة.':''}
+المحتوى:\n"""\n${text.slice(0,30000)}\n"""`;
+
+    const ok=q=>q&&q.q&&(q.type==='tf'||q.type==='short'||q.type==='problem'||(q.type==='mcq'&&Array.isArray(q.options)&&q.options.length>1));
+    const clean=r=>{ const arr=Array.isArray(r)?r:(r.questions||[]); return arr.filter(ok); };
+
+    const ask=async(nq,blobs,label)=>{
+      const opts={cache:false,signal:ctl.signal,status:m=>{out.innerHTML='<div class="msg">⏳ '+label+m+'</div>'}};
+      if(blobs)opts.images=blobs;
+      const full=mk(nq);
+      try{return await sample.json(full,opts)}
+      catch(e){if(e&&(e.code==='invalid_json'||e.code==='cancelled')&&e.text){const r=salvage(e.text);if(r.length)return {questions:r}}throw e}
+    };
+
+    let qs=[];
+    if(useImg){
+      const k=groups.length,per=Math.ceil(n/k);
+      for(let gi=0;gi<k&&qs.length<n;gi++){
+        if(ctl.signal.aborted) break;
+        const blobs=[];
+        for(const p of groups[gi]){const pg=await pdf.getPage(p),vp=pg.getViewport({scale:1.6}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
+          await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;blobs.push(await new Promise(r=>c.toBlob(r,'image/jpeg',.82)))}
+        const partRes=await ask(Math.max(1,Math.min(per,n-qs.length)),blobs,'الجزء '+(gi+1)+' من '+k+': ');
+        qs=qs.concat(clean(partRes));
+      }
+      qs=qs.slice(0,n);
+    }else{
+      const raw=await ask(n,null,'');
+      qs=clean(raw);
+    }
+
+    if(!qs.length){out.innerHTML='<div class="msg err">لم يتم توليد أسئلة مطابقة.</div>';return}
+
+    qs.forEach(q=>{
+      q.id = 'q_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
+      q.starred = false;
+    });
+
+    lastGeneratedQuestions = qs;
+    renderInteractiveQuiz(qs);
+
+  }catch(e){
+    out.innerHTML='<div class="msg err">حدث خطأ أثناء التوليد.</div>';
+  }finally{btn.disabled=false;$('stop').hidden=true}
+};
+
+function salvage(s){
+  const r=[];let d=0,st=-1,inS=false,esc=false;
+  for(let i=0;i<s.length;i++){const ch=s[i];
+    if(inS){if(esc)esc=false;else if(ch==='\\')esc=true;else if(ch==='"')inS=false;continue}
+    if(ch==='"'){inS=true;continue}
+    if(ch==='{'){if(d===0)st=i;d++}
+    else if(ch==='}'){d--;if(d===0&&st>=0){try{r.push(JSON.parse(s.slice(st,i+1)))}catch(e){}st=-1}}
+  }
+  return r;
+}
+
+let pimgs=[];
+const updImg=()=>{$('imgn').textContent=pimgs.length?'🖼️ '+pimgs.length+' صورة مرفقة':''};
+$('sq').addEventListener('paste',e=>{const fs=[...((e.clipboardData&&e.clipboardData.files)||[])].filter(f=>f.type.startsWith('image/'));if(fs.length){pimgs.push(...fs);updImg()}});
+const addTxt=t=>{$('sq').value+=($('sq').value?'\n\n':'')+t};
+$('clip').onclick=async()=>{
+  try{
+    const items=await navigator.clipboard.read();let got=false;
+    for(const it of items){
+      if(it.types.includes('text/plain')){addTxt(await(await it.getType('text/plain')).text());got=true}
+      else{const t=it.types.find(x=>x.startsWith('image/'));if(t){pimgs.push(await it.getType(t));got=true}}
+    }
+    updImg();if(!got)out.innerHTML='<div class="msg err">الحافظة فاضية.</div>';
+  }catch(e){try{addTxt(await navigator.clipboard.readText())}catch(e2){out.innerHTML='<div class="msg err">الصق يدويًا بـ Ctrl+V.</div>'}}
+};
+$('clr').onclick=()=>{$('sq').value='';pimgs=[];updImg()};$('solveBtn').onclick=async()=>{
+  const q=$('sq').value.trim();
+  if(!q&&!pimgs.length){out.innerHTML='<div class="msg err">الصق سؤالًا أو صورة أولًا.</div>';return}
+  if(!$('key').value.trim()){$('set').open=true;out.innerHTML='<div class="msg err">ضع مفتاح Gemini في الإعدادات أولًا.</div>';return}
+  localStorage.setItem('gk',$('key').value.trim());localStorage.setItem('gm',$('model').value.trim());
+  const btn=$('solveBtn');btn.disabled=true;ctl=new AbortController();$('stop').hidden=false;
+  
+  const isVeryDetailed = $('detailLevel').value === 'very_detailed';
+  
+  out.innerHTML='<div class="msg">⏳ جاري الحل '+(isVeryDetailed ? 'بالتفصيل الممل' : 'بالخطوات الواضحة')+'...</div>';
+  try{
+    const detailPrompt = isVeryDetailed 
+      ? 'قم بحل المسألة والتمرين بالتفصيل الممل جداً للمبتدئين! فكك كل القوانين والمعادلات خطوة بخطوة، واشرح سبب استخدام كل قانون وكل تحويل بالوحدات بشكل موسع لا يدع أي مجال للغموض.' 
+      : 'حلّ الأسئلة بخطوات مفصلة وواضحة مرتبة (المعطيات، القوانين، التعويض، والنتيجة النهائية).';
+
+    const prompt=`أنت أستاذ وأخصائي هندسي ومدرس محترف. ${detailPrompt}
+أعد JSON فقط (مصفوفة) بدون أي شرح خارجي خارج الهيكل:
+[
+  {
+    "q":"نص السؤال كاملًا",
+    "steps":[
+      {"t":"الخطوة 1: استخراج المعطيات وتوضيح المفهوم","note":"توضيح وشرح مفصل للمعطيات والرموز...","eq":["S = 60 MVA", "V_L = 24 kV"]},
+      {"t":"الخطوة 2: تطبيق القانون وإيضاح طريقة الحل","note":"شرح تفصيلي للقانون...","eq":["|V| = V_L / sqrt(3)"]},
+      {"t":"الخطوة 3: التعويض الحسابي والخطوات العلاقية","note":"تفكيك الخطوات الحسابية...","eq":["|V| = 24,000 / 1.732 = 13,856.4 V"]}
+    ],
+    "answer":"النتيجة والجواب النهائي المباشر"
+  }
+]
+${q?'الأسئلة:\n"""\n'+q.slice(0,20000)+'\n"""':''}`;
+
+    const opts={signal:ctl.signal,status:m=>{out.innerHTML='<div class="msg">⏳ '+m+'</div>'}};
+    if(pimgs.length)opts.images=pimgs.slice(0,10);
+    let r=await sample.json(prompt,opts);
+    const arr=(Array.isArray(r)?r:[r]).filter(x=>x&&(x.answer||x.steps));
+    renderSol(arr);out.scrollIntoView({behavior:'smooth'});
+  }catch(e){
+    out.innerHTML='<div class="msg err">حدث خطأ أثناء الحل.</div>';
+  }finally{btn.disabled=false;$('stop').hidden=true}
+};
+
+function trEl(t){const d=document.createElement('div');d.className='qtr';d.dir=/[\u0600-\u06FF]/.test(t)?'rtl':'ltr';d.style.unicodeBidi='isolate';d.style.textAlign='start';d.textContent=t;return d}
+const hasAr=t=>/[\u0600-\u06FF]/.test(t||'');
+const dirOf=t=>hasAr(t)?'rtl':'ltr';
+
+function formatMathText(str) {
+  if (!str) return '';
+  let s = String(str);
+
+  s = s.replace(/\\text\s*\{([^}]*)\}/g, '$1') .replace(/\\mathrm\s*\{([^}]*)\}/g, '$1');
+  s = s.replace(/\\frac\s*\{([^}]*)\}\s*\{([^}]*)\}/g, '($1 / $2)');
+  s = s.replace(/\\angle/g, '∠ ')
+       .replace(/\\theta/g, 'θ')
+       .replace(/\\Rightarrow/g, ' ➔ ')
+       .replace(/\\times/g, ' × ')
+       .replace(/\\circ/g, '°')
+       .replace(/\\sqrt\s*\{([^}]*)\}/g, '√($1)');
+
+  s = s.replace(/_\{\s*([^}]+)\s*\}/g, '<sub>$1</sub>')
+       .replace(/_([a-zA-Z0-9]+)/g, '<sub>$1</sub>');
+
+  s = s.replace(/\^\{\s*([^}]+)\s*\}/g, '<sup>$1</sup>')
+       .replace(/\^([a-zA-Z0-9°]+)/g, '<sup>$1</sup>');
+
+  s = s.replace(/\\/g, '');
+
+  return s;
+}
+
+const eqEl = t => {
+  const d = document.createElement('div');
+  d.className = 'eq';
+  d.dir = 'ltr';
+  d.style.fontFamily = '"Cairo", "Segoe UI", Tahoma, sans-serif';
+  d.innerHTML = formatMathText(t);
+  return d;
+};
+
+function txtEl(cls,t){const d=document.createElement('div');d.className=cls;d.dir=dirOf(t);d.style.unicodeBidi='isolate';d.style.textAlign='start';d.textContent=t;return d}
+
+function stepEl(st,i){
+  if(!st) return document.createElement('div');
+  if(typeof st==='string') st={note:st};
+  const w=document.createElement('div');w.className='st';
+  
+  if(st.t && String(st.t) !== 'undefined'){
+    const h=document.createElement('div');h.className='stt';h.dir=dirOf(st.t);
+    const n=document.createElement('span');n.className='num';n.textContent=(i+1);h.appendChild(n);
+    const tx=document.createElement('span');tx.style.unicodeBidi='isolate';tx.textContent=st.t;h.appendChild(tx);w.appendChild(h);
+  }
+  
+  if(st.note && String(st.note) !== 'undefined' && String(st.note).trim() !== ''){
+    w.appendChild(txtEl('note',st.note));
+  }
+  
+  if(st.eq){
+    const arr = Array.isArray(st.eq)? st.eq : [st.eq];
+    arr.forEach(e=>{
+      if(e != null && String(e).trim() !== '' && String(e) !== 'undefined'){
+        w.appendChild(eqEl(String(e)));
+      }
+    });
+  }
+  return w;
+}
+
+function ansEl(a){
+  const b=document.createElement('div');b.className='ans';
+  const h=txtEl('stt','✅ النتيجة والجواب النهائي');h.dir='rtl';b.appendChild(h);
+  if(a && String(a) !== 'undefined') b.appendChild(txtEl('note',String(a)));
+  return b;
+}
+
+function renderSol(arr){
+  out.innerHTML='';
+  
+  const clearTopBtn = document.createElement('button');
+  clearTopBtn.className = 'danger';
+  clearTopBtn.style.margin = '0 0 14px 0';
+  clearTopBtn.innerHTML = '🗑️ إخلاء ومسح جميع الإجابات من الصفحة';
+  clearTopBtn.onclick = () => { out.innerHTML = ''; };
+  out.appendChild(clearTopBtn);
+
+  arr.forEach((x,i)=>{
+    const cardId = 'solution_card_' + i;
+    const c=el('div','card q');
+    c.id = cardId;
+    c.appendChild(el('h3','',(i+1)+'. '+x.q));
+    
+    (x.steps||[]).forEach((st,j)=>c.appendChild(stepEl(st,j)));
+    if(x.answer)c.appendChild(ansEl(x.answer));
+    
+    const imgExportBtn = document.createElement('button');
+    imgExportBtn.style.marginTop = '12px';
+    imgExportBtn.style.background = 'var(--okb)';
+    imgExportBtn.style.color = 'var(--ok)';
+    imgExportBtn.style.borderColor = 'var(--ok)';
+    imgExportBtn.innerHTML = '📸 حفظ ومشاركة الشرح كصورة (PNG)';
+    imgExportBtn.onclick = () => {
+      html2canvas(c, { scale: 2, useCORS: true }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `شرح_المسألة_${i+1}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    };
+    c.appendChild(imgExportBtn);
+
+    out.appendChild(c);
+  });
+}
+
+function el(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;e.dir='auto';return e}
+
+function renderInteractiveQuiz(qs){
+  if(!qs.length){out.innerHTML='<div class="msg err">لا توجد أسئلة للعرض.</div>';return}
+  out.innerHTML='';
+
+  const topBar = document.createElement('div');
+  topBar.style.display = 'flex';
+  topBar.style.justifyContent = 'space-between';
+  topBar.style.alignItems = 'center';
+  topBar.style.marginBottom = '12px';
+
+  const clearCurrentQsBtn = document.createElement('button');
+  clearCurrentQsBtn.className = 'danger';
+  clearCurrentQsBtn.innerHTML = '🗑️ تفريغ ومسح الأسئلة الحالية من الشاشة';
+  clearCurrentQsBtn.onclick = () => {
+    if(confirm('هل تريد مسح وإزالة جميع الأسئلة المعروضة حالياً من الشاشة لتسريع الصفحة؟')){
+      out.innerHTML = '';
+      lastGeneratedQuestions = [];
+    }
+  };
+  topBar.appendChild(clearCurrentQsBtn);
+  out.appendChild(topBar);
+
+  let done=0,right=0;
+  const sc=el('div','card score','إجمالي الأسئلة: '+qs.length);out.appendChild(sc);
+  const fin=ok=>{done++;if(ok)right++;sc.textContent='النتيجة: '+right+' / '+done+' (من '+qs.length+')'};
+
+  qs.forEach((q,i)=>{
+    const c=el('div','card q');
+    const headDiv=document.createElement('div');
+    headDiv.style.display='flex';headDiv.style.justifyContent='space-between';headDiv.style.alignItems='flex-start';headDiv.style.gap='10px';
+    
+    const h3=el('h3','',(i+1)+'. '+q.q);
+    h3.style.flex='1';
+    headDiv.appendChild(h3);
+
+    if(q.difficulty){
+      const badge=document.createElement('span');
+      badge.className='badge '+(q.difficulty==='سهل'?'easy':q.difficulty==='صعب'?'hard':'med');
+      badge.textContent=q.difficulty;
+      headDiv.appendChild(badge);
+    }
+    c.appendChild(headDiv);
+
+    if(q.q_tr)c.appendChild(trEl(q.q_tr));
+    const exp=el('div','exp');exp.hidden=true;
+    
+    const show=pre=>{
+      exp.textContent='';
+      const h=el('div','',pre);h.style.fontWeight='700';h.style.marginBottom='6px';exp.appendChild(h);
+      
+      // الشرح المباشر البسيط للأسئلة النظرية
+      if (typeof q.explanation === 'string') {
+        const p = document.createElement('div');
+        p.textContent = q.explanation;
+        exp.appendChild(p);
+      } else if (Array.isArray(q.explanation)) {
+        q.explanation.forEach((st, j) => {
+          if (st) exp.appendChild(stepEl(st, j));
+        });
+      }
+
+      const qImgBtn = document.createElement('button');
+      qImgBtn.style.marginTop = '10px';
+      qImgBtn.style.fontSize = '0.85rem';
+      qImgBtn.style.background = 'var(--okb)';
+      qImgBtn.style.color = 'var(--ok)';
+      qImgBtn.style.borderColor = 'var(--ok)';
+      qImgBtn.innerHTML = '📸 حفظ الشرح والحل كصورة (PNG)';
+      qImgBtn.onclick = () => {
+        html2canvas(c, { scale: 2, useCORS: true }).then(canvas => {
+          const link = document.createElement('a');
+          link.download = `شرح_السؤال_${i+1}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        });
+      };
+      exp.appendChild(qImgBtn);
+
+      exp.hidden=false;
+    };
+
+    if(q.type==='mcq'||q.type==='tf'){
+      let opts, ans;
+      if(q.type === 'tf'){
+        opts = ['صح / True', 'خطأ / False'];
+        if (typeof q.answer === 'boolean') {
+          ans = q.answer ? 0 : 1;
+        } else if (typeof q.answer === 'string') {
+          const lower = q.answer.trim().toLowerCase();
+          ans = (lower === 'true' || lower === 'صح' || lower === '0') ? 0 : 1;
+        } else {
+          ans = q.answer === 0 ? 0 : 1;
+        }
+      } else {
+        opts = q.options;
+        ans = q.answer;
+      }
+
+      const bs=opts.map(o=>{const b=el('button','opt',o);c.appendChild(b);return b});
+      bs.forEach((b,j)=>b.onclick=()=>{
+        bs.forEach(x=>x.disabled=true);
+        bs[ans].classList.add('ok');
+        if(j!==ans)b.classList.add('no');
+        show(j===ans?'✅ إجابة صحيحة':'❌ الصحيح: '+opts[ans]);
+        fin(j===ans);
+      });
+    }else{
+      const b=el('button','', q.type==='problem'?'أظهر الحل بالخطوات':'أظهر الإجابة');c.appendChild(b);
+      b.onclick=()=>{b.hidden=true;show('✅ '+q.answer)};
+    }
+    c.appendChild(exp);out.appendChild(c);
+  });
+
+  const savePanel = document.createElement('div');
+  savePanel.className = 'card';
+  savePanel.style.border = '2px dashed var(--ac)';
+  savePanel.innerHTML = `
+    <h3 style="margin-top:0; color:var(--ac);">💾 حفظ الأسئلة في المكتبة</h3>
+    <p class="hint">حدد الأسئلة التي ترغب في الاحتفاظ بها في سجلك الخاص ثم اضغط زر الحفظ أدناه:</p>
+    <div style="display:flex; gap:10px; margin:10px 0;">
+      <button id="selectAllQ" style="font-size:0.8rem; padding:4px 8px;">تحديد الكل</button>
+      <button id="deselectAllQ" style="font-size:0.8rem; padding:4px 8px;">إلغاء التحديد</button>
+    </div>
+    <div id="quizSaveCheckboxes" style="display:flex; flex-direction:column; gap:6px; max-height:200px; overflow-y:auto; padding:8px; background:var(--bg); border-radius:8px;"></div>
+    <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
+      <button class="pri" id="confirmSaveSelectedBtn" style="flex:1; margin-top:0;">💾 حفظ الأسئلة المحددة للمكتبة</button>
+      <button class="danger" id="clearAllOutputBtn" style="padding:10px 14px;">🗑️ حظر وإزالة الأسئلة من الشاشة</button>
+    </div>
+  `;
+  out.appendChild(savePanel);
+
+  const container = $('quizSaveCheckboxes');
+  qs.forEach((q, idx) => {
+    const lbl = document.createElement('label');
+    lbl.style.display = 'flex';
+    lbl.style.alignItems = 'center';
+    lbl.style.gap = '8px';
+    lbl.style.fontSize = '0.9rem';
+    lbl.style.cursor = 'pointer';
+    lbl.innerHTML = `<input type="checkbox" name="saveQCheck" value="${q.id}" checked> <span>${idx+1}. ${q.q.slice(0, 70)}...</span>`;
+    container.appendChild(lbl);
+  });
+
+  $('selectAllQ').onclick = () => { container.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true); };
+  $('deselectAllQ').onclick = () => { container.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false); };
+
+  $('confirmSaveSelectedBtn').onclick = () => {
+    const selected = [...container.querySelectorAll('input[name="saveQCheck"]:checked')].map(cb => cb.value);
+    if(!selected.length){ alert('الرجاء تحديد سؤال واحد على الأقل للحفظ.'); return; }
+    const savedCount = saveSelectedQuestions(selected);
+    alert(`تم حفظ ${savedCount} سؤالاً بنجاح في المكتبة!`);
+    savePanel.style.display = 'none';
+  };
+
+  $('clearAllOutputBtn').onclick = () => {
+    if(confirm('هل تريد مسح وإزالة الأسئلة من الشاشة للبدء من جديد؟')){
+      out.innerHTML = '';
+      lastGeneratedQuestions = [];
+    }
+  };
+}
+</script>
+</body>
+</html>

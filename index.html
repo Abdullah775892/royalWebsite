@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>الجامع للمواقع</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#07142B">
+<meta name="application-name" content="الجامع">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="الجامع">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icon.png" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+    --gold:#D4AF37;
+    --gold-light:#f3d98b;
+    --navy:#07142B;
+    --navy-light:#10254b;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'IBM Plex Sans Arabic',sans-serif;
+    min-height:100vh;
+
+    background:
+    radial-gradient(circle at top right,#17366e 0%,transparent 35%),
+    radial-gradient(circle at bottom left,#8b6b16 0%,transparent 30%),
+    linear-gradient(135deg,#030811,#07142B,#0A1D3F);
+
+    color:white;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    padding:40px 20px;
+}
+
+header{
+    text-align:center;
+    margin-bottom:50px;
+}
+
+header h1{
+    font-size:4rem;
+    color:var(--gold);
+    font-weight:700;
+
+    text-shadow:
+    0 0 15px rgba(212,175,55,.4),
+    0 0 35px rgba(212,175,55,.3);
+
+    margin-bottom:15px;
+}
+
+header p{
+    font-size:1.1rem;
+    color:#d9d9d9;
+}
+
+section{
+    width:100%;
+    max-width:900px;
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(260px,1fr));
+
+    gap:25px;
+}
+
+.card{
+    text-decoration:none;
+    color:white;
+
+    background:rgba(255,255,255,.05);
+
+    backdrop-filter:blur(12px);
+
+    border:1px solid rgba(212,175,55,.25);
+
+    padding:30px;
+
+    border-radius:20px;
+
+    transition:.35s ease;
+
+    box-shadow:
+    0 10px 30px rgba(0,0,0,.25);
+}
+
+.card:hover{
+    transform:translateY(-8px);
+
+    border-color:var(--gold);
+
+    box-shadow:
+    0 20px 40px rgba(0,0,0,.35),
+    0 0 20px rgba(212,175,55,.25);
+}
+
+.card h2{
+    color:var(--gold);
+    margin-bottom:12px;
+    font-size:1.4rem;
+}
+
+.card p{
+    color:#d8dde8;
+    line-height:1.8;
+}
+
+footer{
+    margin-top:60px;
+    color:#cfcfcf;
+    font-size:.9rem;
+}
+
+.gold-line{
+    width:120px;
+    height:4px;
+    background:linear-gradient(
+        to left,
+        transparent,
+        var(--gold),
+        transparent
+    );
+
+    margin:18px auto;
+    border-radius:50px;
+}
+
+
+/* ===== PWA ===== */
+[hidden]{display:none !important}
+
+.install{
+    position:fixed;
+    bottom:22px;
+    right:22px;
+    z-index:50;
+    font:inherit;
+    font-weight:600;
+    cursor:pointer;
+    border:0;
+    color:var(--navy);
+    background:linear-gradient(135deg,var(--gold-light),var(--gold));
+    padding:14px 24px;
+    border-radius:50px;
+    box-shadow:0 10px 30px rgba(0,0,0,.4),0 0 25px rgba(212,175,55,.4);
+    animation:pulse 2.4s ease-in-out infinite;
+    transition:.3s;
+}
+.install:hover{transform:translateY(-4px)}
+@keyframes pulse{50%{box-shadow:0 10px 30px rgba(0,0,0,.4),0 0 45px rgba(212,175,55,.7)}}
+
+.net{
+    position:fixed;
+    top:14px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:60;
+    background:#b45309;
+    color:#fff;
+    padding:10px 20px;
+    border-radius:50px;
+    font-size:.9rem;
+    box-shadow:0 8px 24px rgba(0,0,0,.4);
+    max-width:92vw;
+    text-align:center;
+}
+
+.sheet{
+    position:fixed;
+    inset:0;
+    z-index:70;
+    display:grid;
+    place-items:center;
+    padding:20px;
+    background:rgba(0,0,0,.65);
+    backdrop-filter:blur(6px);
+}
+.sheet .box{
+    max-width:380px;
+    text-align:center;
+    background:var(--navy-light);
+    border:1px solid rgba(212,175,55,.4);
+    border-radius:22px;
+    padding:28px;
+    animation:pop .35s;
+}
+@keyframes pop{from{opacity:0;transform:scale(.85)}}
+.sheet h3{color:var(--gold);margin-bottom:12px}
+.sheet p{color:#d8dde8;line-height:1.9;margin-bottom:18px}
+.sheet button{
+    font:inherit;
+    font-weight:600;
+    cursor:pointer;
+    border:0;
+    color:var(--navy);
+    background:linear-gradient(135deg,var(--gold-light),var(--gold));
+    padding:10px 28px;
+    border-radius:14px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <h1>الجامع للمواقع</h1>
+
+    <div class="gold-line"></div>
+
+    <p>
+        منصة تجمع أدواتك الذكية في مكان واحد
+    </p>
+
+</header>
+
+<section>
+
+<a class="card" href="./student-assistor.html">
+
+    <h2>📚 مساعد الطالب</h2>
+
+    <p>
+        أدوات وخدمات تساعد الطالب على إنجاز مهامه
+        وتنظيم دراسته بكفاءة.
+    </p>
+
+</a>
+
+<a class="card" href="./pdf-margins.html">
+
+    <h2>📝 مضيف الهوامش</h2>
+
+    <p>
+        أضف المراجع والهوامش بسهولة وبشكل احترافي.
+    </p>
+
+</a>
+
+<a class="card"
+href="./QuestionSolver-main/questions-solver.html">
+
+    <h2>🤖 مولد الأسئلة بالذكاء الاصطناعي</h2>
+
+    <p>
+        إنشاء أسئلة واختبارات متنوعة بطريقة ذكية
+        لدعم التعلم والمراجعة.
+    </p>
+
+</a>
+
+</section>
+
+<footer>
+    حقوق النشر © 2026 الجامع للمواقع
+</footer>
+
+<!-- PWA: زر التثبيت + حالة الاتصال -->
+<button id="installBtn" class="install" hidden>📲 ثبّت التطبيق</button>
+
+<div id="net" class="net" hidden>
+    📡 أنت غير متصل — الأدوات المحفوظة تعمل، أما الذكاء الاصطناعي فيحتاج إنترنت
+</div>
+
+<div id="iosSheet" class="sheet" hidden>
+    <div class="box">
+        <h3>التثبيت على الآيفون</h3>
+        <p>
+            اضغط زر المشاركة <b>⬆️</b> في Safari،
+            ثم اختر <b>«إضافة إلى الشاشة الرئيسية»</b>.
+        </p>
+        <button id="iosClose">فهمت</button>
+    </div>
+</div>
+
+<script>
+/* تسجيل الـ Service Worker (يعمل على https أو localhost فقط) */
+if ('serviceWorker' in navigator &&
+    (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW:', err));
+    });
+}
+
+/* زر التثبيت */
+(() => {
+    const btn = document.getElementById('installBtn'),
+          sheet = document.getElementById('iosSheet'),
+          net = document.getElementById('net');
+    const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    let deferred = null;
+
+    window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferred = e;
+        if (!standalone) btn.hidden = false;
+    });
+
+    if (isIOS && !standalone) btn.hidden = false;
+
+    btn.onclick = async () => {
+        if (deferred) {
+            deferred.prompt();
+            await deferred.userChoice;
+            deferred = null;
+            btn.hidden = true;
+        } else if (isIOS) {
+            sheet.hidden = false;
+        }
+    };
+
+    window.addEventListener('appinstalled', () => { btn.hidden = true; });
+
+    document.getElementById('iosClose').onclick = () => sheet.hidden = true;
+    sheet.addEventListener('click', e => { if (e.target === sheet) sheet.hidden = true; });
+    addEventListener('keydown', e => { if (e.key === 'Escape') sheet.hidden = true; });
+
+    /* حالة الاتصال */
+    const upd = () => net.hidden = navigator.onLine;
+    addEventListener('online', upd);
+    addEventListener('offline', upd);
+    upd();
+})();
+</script>
+
+</body>
+</html>
