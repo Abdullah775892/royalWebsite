@@ -32,7 +32,11 @@ main{max-width:1500px;margin:auto;padding:18px}
 .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;margin:14px 0}
 input,select,textarea{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;outline:0;transition:.2s}
 select option{background:var(--bg)}
-input:focus,select:focus{border-color:var(--pri);box-shadow:0 0 0 3px var(--glow3)}
+input:focus,select:focus,textarea:focus{border-color:var(--pri);box-shadow:0 0 0 3px var(--glow3)}
+textarea{width:100%;min-height:220px;resize:vertical;line-height:1.9;font-size:var(--fs)}.row textarea{flex:1;min-width:100%}
+.row.cc{gap:6px 8px}.row.cc label{min-width:0!important;margin-inline-start:6px}
+.row.cc input[type=color]{flex:0 0 46px;min-width:46px!important;width:46px;height:38px;padding:2px}
+.row.cc input[type=checkbox]{min-width:0;width:auto;flex:none}.row.cc select{flex:0 1 150px;min-width:110px}
 .pg{width:110px;text-align:center}
 .prog{height:12px;border-radius:9px;background:var(--bd);overflow:hidden;margin:6px 0}
 #pb{height:100%;width:0;background:linear-gradient(90deg,var(--pri),var(--pri2),#10b981);background-size:200%;transition:width .6s;animation:sh 3s linear infinite}
@@ -51,7 +55,9 @@ input:focus,select:focus{border-color:var(--pri);box-shadow:0 0 0 3px var(--glow
 .dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
 @keyframes bn{50%{transform:translateY(-10px)}}
 .modal{position:fixed;inset:0;z-index:50;background:#000a;backdrop-filter:blur(6px);display:none;place-items:center;padding:16px}
-.modal.on{display:grid}
+.modal.on{display:grid;overscroll-behavior:contain}
+html.lock,html.lock body{overflow:hidden}
+.box{overscroll-behavior:contain}
 .box{background:var(--bg);border:1px solid var(--bd);border-radius:20px;padding:22px;width:min(900px,100%);max-height:92vh;overflow:auto;animation:pop .35s}
 @keyframes pop{from{opacity:0;transform:scale(.85)}}
 .box h2{margin-bottom:14px}
@@ -65,8 +71,8 @@ table{width:100%;border-collapse:collapse}th{background:var(--pri);color:#fff;pa
 .book small{color:var(--mut);display:block;margin-top:4px}
 .book b{display:block;font-size:.9rem;word-break:break-word}
 .book .x{position:absolute;top:4px;left:4px;padding:2px 8px;font-size:.8rem}
-#toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,100px);background:var(--tx);color:var(--bg);padding:12px 22px;border-radius:30px;z-index:90;transition:.4s}
-#toast.on{transform:translate(-50%,0)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,100px);background:var(--tx);color:var(--bg);padding:12px 22px;border-radius:30px;z-index:90;transition:.4s;opacity:0;pointer-events:none;visibility:hidden}
+#toast.on{transform:translate(-50%,0);opacity:1;visibility:visible}
 .cropper-container{direction:ltr;font-size:0;line-height:0;position:relative;user-select:none;touch-action:none}
 .cropper-container img{display:block;height:100%;image-orientation:0deg;max-height:none!important;max-width:none!important;min-height:0!important;min-width:0!important;width:100%}
 .cropper-wrap-box,.cropper-canvas,.cropper-drag-box,.cropper-crop-box,.cropper-modal{bottom:0;left:0;position:absolute;right:0;top:0}
@@ -128,7 +134,7 @@ body.m-bar nav{position:fixed;bottom:0;left:0;right:0;z-index:40;background:var(
 body.m-bar nav button{flex:1 0 66px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;font-size:.68rem;background:none;box-shadow:none;color:var(--tx);white-space:nowrap}
 body.m-bar nav button i{margin:0;font-size:1.35rem}
 body.m-bar nav button.r{color:#f87171}
-body.m-bar main{padding-bottom:92px}body.m-bar #toast{bottom:92px}
+body.m-bar main{padding-bottom:92px}body.m-bar #toast{bottom:calc(92px + env(safe-area-inset-bottom))}
 header{position:static;padding:10px 12px;gap:6px}
 header h1{width:100%;font-size:1.3rem}
 button,.btn{padding:8px 11px;font-size:.85rem;border-radius:10px}
@@ -151,10 +157,11 @@ th,td{padding:6px;font-size:.85rem}
 <button onclick="openLib()"><i>📚</i><span>المكتبة</span></button>
 <button onclick="openVoc()"><i>📒</i><span>المفردات</span></button>
 <button onclick="openNotes()"><i>🗂</i><span>ملاحظاتي</span></button>
+<button onclick="newNote()"><i>✍️</i><span>ملاحظة جديدة</span></button>
 <button onclick="clip()"><i>📋</i><span>من الحافظة</span></button>
 <button onclick="startCrop()"><i>✂️</i><span>ترجمة جزء</span></button>
 <button class="r" onclick="stopAll()"><i>⏹</i><span>إيقاف</span></button>
-<button class="r" onclick="clearCache()"><i>🗑</i><span>حذف الذاكرة</span></button>
+<button class="r" onclick="openDel()"><i>🗑</i><span>حذف</span></button>
 <button class="s" onclick="M('mSet',1)"><i>⚙️</i><span>الإعدادات</span></button>
 <button class="s" onclick="openTheme()"><i>🎨</i><span>الثيم</span></button>
 </nav>
@@ -238,15 +245,26 @@ th,td{padding:6px;font-size:.85rem}
 <div class="row"><label>المستوى</label><select id="lvS"><option>مبسّط جداً</option><option>متوسط</option><option>متقدم</option></select></div>
 <div class="row"><label>الطول</label><select id="lnS"><option>مختصر</option><option>متوازن</option><option>مفصل</option></select></div>
 <div class="row"><button class="g" onclick="lvlStart()">ابدأ الشرح</button><button class="s" onclick="M('mLvl',0)">إلغاء</button></div></div></div>
+<div class="modal" id="mDel"><div class="box" style="max-width:520px"><h2>🗑 الحذف</h2>
+<p id="dc" style="color:var(--mut);margin:0 0 12px;line-height:1.8"></p>
+<div class="row"><button class="r" onclick="delMem(1,0)">🧠 حذف الذاكرة فقط</button></div>
+<div class="row"><button class="r" onclick="delMem(0,1)">📝 حذف الملاحظات فقط</button></div>
+<div class="row"><button class="r" onclick="delMem(1,1)">🗑 حذف الذاكرة والملاحظات معاً</button></div>
+<div class="row"><button class="s" onclick="M('mDel',0)">إغلاق</button></div></div></div>
 <div class="modal" id="mAsk"><div class="box" style="max-width:420px;text-align:center"><h2 id="aq"></h2><div class="row" style="justify-content:center"><button class="r" id="ay">نعم</button><button class="s" id="an">إلغاء</button></div></div></div>
-<div class="modal" id="mNotes"><div class="box"><h2>🗂 ملاحظاتي المحفوظة</h2><div class="row"><input id="nq" placeholder="ابحث باسم الكتاب أو النص..." oninput="openNotes()"><button class="s" onclick="M('mNotes',0)">إغلاق</button></div><div id="nl"></div></div></div>
+<div class="modal" id="mNotes"><div class="box"><h2>🗂 ملاحظاتي المحفوظة</h2><div class="row"><input id="nq" placeholder="ابحث باسم الكتاب أو النص..." oninput="openNotes()"><button class="g" onclick="newNote()">✍️ جديدة</button><button class="s" onclick="expNotes()">⬇ JSON</button><button class="s" onclick="M('mNotes',0)">إغلاق</button></div><div class="row" id="nc"></div><div id="nl"></div></div></div>
+<div class="modal" id="mNew"><div class="box" style="max-width:640px"><h2>✍️ ملاحظة جديدة</h2>
+<div class="row"><input id="nt" dir="auto" placeholder="عنوان الملاحظة" maxlength="80"></div>
+<div class="row"><textarea id="nb" dir="auto" placeholder="اكتب ملاحظتك هنا..."></textarea></div>
+<div class="row"><button class="g" id="ns" onclick="saveNew()">💾 حفظ</button><button onclick="newImg()">🖼 حفظ كصورة</button><button class="s" onclick="newCopy()">📋 نسخ</button><button class="s" onclick="M('mNew',0)">إغلاق</button></div></div></div>
 <div class="modal" id="mTheme"><div class="box"><h2>🎨 الثيمات</h2>
 <div class="shelf" id="tl"></div>
 <h3 style="margin-top:18px">ثيم جديد</h3>
 <div class="row"><label>اللون الأساسي</label><input type="color" id="tc1" value="#8b5cf6"><label style="min-width:90px">الثانوي</label><input type="color" id="tc2" value="#22d3ee"></div>
 <div class="row"><label>الخلفية</label><select id="tb"><option value="dark">داكنة 🌙</option><option value="light">فاتحة ☀️</option></select><input id="tn" placeholder="اسم الثيم"></div>
 <div class="row"><button class="g" onclick="saveTheme()">💾 حفظ كثيم جديد</button><button class="s" onclick="closeTheme()">إغلاق</button></div></div></div>
-<div class="modal" id="mCards"><div class="box"><h2>🖼 بطاقات الصور</h2><div class="row"><button class="g" onclick="dlAll()">⬇ تحميل الكل</button><button class="s" onclick="M('mCards',0)">إغلاق</button></div><div class="shelf" id="cg" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr))"></div></div></div>
+<div class="modal" id="mCards"><div class="box"><h2>🖼 بطاقات الصور</h2>
+<div class="row cc"><label>الألوان</label><select id="cp"></select><label>الخلفية</label><input type="color" id="c1" title="لون الخلفية (بداية)"><input type="color" id="c2" title="لون الخلفية (نهاية)"><label>التمييز</label><input type="color" id="c3" title="لون التمييز 1"><input type="color" id="c4" title="لون التمييز 2"><label>النص</label><input type="color" id="c5" title="لون النص"><label><input type="checkbox" id="cau"> تلقائي</label></div><div class="row"><button class="g" onclick="dlAll()">⬇ تحميل الكل</button><button class="s" onclick="M('mCards',0)">إغلاق</button></div><div class="shelf" id="cg" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr))"></div></div></div>
 <div id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -262,9 +280,9 @@ pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/p
 const DB=new Promise(r=>{const q=indexedDB.open('sa',2);q.onupgradeneeded=()=>{const d=q.result,mk=(n,o)=>d.objectStoreNames.contains(n)||d.createObjectStore(n,o);mk('cache',{keyPath:'id'});mk('books',{keyPath:'id'});mk('vocab',{keyPath:'id',autoIncrement:true});mk('notes',{keyPath:'id',autoIncrement:true})};q.onsuccess=()=>r(q.result)});
 const tx=async(s,m,f)=>{const d=await DB;return new Promise((res,rej)=>{const t=d.transaction(s,m),o=f(t.objectStore(s));t.oncomplete=()=>res(o.result);t.onerror=rej})};
 const put=(s,v)=>tx(s,'readwrite',o=>o.put(v)),get=(s,k)=>tx(s,'readonly',o=>o.get(k)),all=s=>tx(s,'readonly',o=>o.getAll()),del=(s,k)=>tx(s,'readwrite',o=>o.delete(k)),clr=s=>tx(s,'readwrite',o=>o.clear());
-const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),3000)};
+let toastT;const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),3000)};
 const openM=[];
-function M(id,on){$('#'+id).classList.toggle('on',!!on);const i=openM.indexOf(id);if(i>=0)openM.splice(i,1);if(on)openM.push(id)}
+function M(id,on){$('#'+id).classList.toggle('on',!!on);const i=openM.indexOf(id);if(i>=0)openM.splice(i,1);if(on)openM.push(id);document.documentElement.classList.toggle('lock',openM.length>0)}
 const BT=[{id:'dark',name:'داكن',base:'dark',pri:'#6366f1',pri2:'#06b6d4'},{id:'light',name:'فاتح',base:'light',pri:'#6366f1',pri2:'#06b6d4'},{id:'emerald',name:'زمردي',base:'dark',pri:'#10b981',pri2:'#22d3ee'},{id:'sunset',name:'غروب',base:'dark',pri:'#f43f5e',pri2:'#f59e0b'}];
 let T=Object.assign({cur:'dark',custom:[]},JSON.parse(localStorage.T||'{}'));
 const allT=()=>[...BT,...T.custom],hx=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),saveT=()=>localStorage.T=JSON.stringify(T);
@@ -387,7 +405,11 @@ async function prog(){
  $('#pb').style.width=Math.round(bt.d/(bt.n||1)*100)+'%';
  $('#pt').textContent=`${bt.d}/${bt.n} صفحات · الكتاب كامل ${Math.round(a/cur.t*100)}% (${a}/${cur.t})`;
 }
-async function clearCache(){if(await ask('حذف كل الترجمات المحفوظة؟')){await clr('cache');bt={d:0,n:0};$('#pb').style.width=0;$('#pt').textContent='0%';toast('تم حذف الذاكرة 🗑')}}
+async function openDel(){const[c,n]=await Promise.all([all('cache'),all('notes')]);$('#dc').textContent=`الذاكرة: ${c.length} عنصر مخزّن (ترجمات وشروحات محفوظة) · الملاحظات: ${n.length} ملاحظة`;M('mDel',1)}
+async function delMem(m,n){const w=m&&n?'الذاكرة والملاحظات':m?'الذاكرة':'الملاحظات';if(!await ask(`حذف ${w}؟ لا يمكن التراجع عن ذلك.`))return;
+ if(m){await clr('cache');bt={d:0,n:0};$('#pb').style.width=0;$('#pt').textContent='0%'}
+ if(n){await clr('notes');if(openM.includes('mNotes'))openNotes()}
+ M('mDel',0);toast(`تم حذف ${w} 🗑`)}
 
 /* ---------- ترجمة الصور والشرح ---------- */
 const dots='<div class="dots"><span></span><span></span><span></span></div>';
@@ -456,28 +478,48 @@ function unlatex(t){
 function math(el){try{window.renderMathInElement&&renderMathInElement(el,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false},{left:'$',right:'$',display:false}],throwOnError:false})}catch{}}
 function setTr(t){const e=$('#tr');e.textContent=t;e.dataset.t=t;math(e)}
 
+/* ---------- ألوان بطاقة الصورة ---------- */
+const CPR=[['حسب الثيم',null],['ليلي',{bg1:'#0a0e1d',bg2:'#1b2a5e',a1:'#6366f1',a2:'#06b6d4'}],['ورقي',{bg1:'#fdf8ec',bg2:'#f0e4c8',a1:'#b45309',a2:'#0f766e'}],['أبيض',{bg1:'#ffffff',bg2:'#e8eeff',a1:'#4f46e5',a2:'#0891b2'}],['زمردي',{bg1:'#04130f',bg2:'#0b3d33',a1:'#10b981',a2:'#22d3ee'}],['غروب',{bg1:'#1a0b14',bg2:'#4a1d2e',a1:'#f43f5e',a2:'#f59e0b'}],['أسود',{bg1:'#000000',bg2:'#1c1c1c',a1:'#f5f5f5',a2:'#a3a3a3'}]];
+let CC=Object.assign({mode:'auto',p:0,bg1:'#0a0e1d',bg2:'#1b2a5e',a1:'#6366f1',a2:'#06b6d4',tx:'#ffffff',tAuto:true},JSON.parse(localStorage.CC||'{}')),lastCard=null;
+const lum=h=>{const[r,g,b]=hx(h);return(.299*r+.587*g+.114*b)/255};
+const CB=()=>{const t=curTheme();return{bg1:t.base=='dark'?mix(getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0a0e1d','#000000',.2):'#0a0e1d',bg2:'#1b2a5e',a1:t.pri,a2:t.pri2}};
+function cardCols(){
+ const b=CC.mode=='custom'?CC:CB(),L=(lum(b.bg1)+lum(b.bg2))/2>.6,tx=CC.mode=='custom'&&!CC.tAuto?CC.tx:null;
+ return{bg1:b.bg1,bg2:b.bg2,a1:b.a1,a2:b.a2,title:tx||(L?'#12182b':'#ffffff'),body:tx||(L?'#1f2a44':'#e8ecff'),sub:L?mix(b.a1,'#000000',.25):(CC.mode=='custom'?mix(b.a2,'#ffffff',.4):'#67e8f9'),foot:tx?mix(tx,L?'#ffffff':'#000000',.45):(L?'#64708a':'#8b96b8')};
+}
+function syncCC(){const c=cardCols();[c.bg1,c.bg2,c.a1,c.a2,CC.mode=='custom'&&!CC.tAuto?CC.tx:c.title].forEach((v,i)=>$('#c'+(i+1)).value=v);$('#cau').checked=CC.mode=='auto'||CC.tAuto;$('#cp').value=CC.mode=='auto'?'0':CC.p}
+const rr=(()=>{let t;return()=>{clearTimeout(t);t=setTimeout(()=>lastCard&&cardImg(...lastCard,true),150)}})();
+function ccSave(){localStorage.CC=JSON.stringify(CC);syncCC();rr()}
+function ccPick(k,v){if(CC.mode=='auto')Object.assign(CC,CB());CC.mode='custom';CC.p='c';CC[k]=v;if(k=='tx')CC.tAuto=false;ccSave()}
+$('#cp').innerHTML=CPR.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join('')+'<option value="c">مخصص</option>';
+$('#cp').onchange=e=>{const v=e.target.value;if(v=='c')return;const i=+v;if(i==0){CC.mode='auto';CC.p=0}else Object.assign(CC,CPR[i][1],{mode:'custom',p:i,tAuto:true});ccSave()};
+['bg1','bg2','a1','a2','tx'].forEach((k,i)=>$('#c'+(i+1)).oninput=e=>ccPick(k,e.target.value));
+$('#cau').onchange=e=>{if(e.target.checked){if(CC.mode=='custom')CC.tAuto=true;ccSave()}else ccPick('tx',cardCols().title)};
+
 let cardList=[];
-async function cardImg(title,sub,body,fn){
+async function cardImg(title,sub,body,fn,raw,quiet){lastCard=[title,sub,body,fn,raw];
  const FN=FNAME();try{await document.fonts.load(`700 30px "${FN}"`)}catch{}
  const W=1080,P=72,LH=62,MAX=24,F=(z,w=400)=>`${w} ${z}px "${FN}",Tahoma,sans-serif`,m=document.createElement('canvas').getContext('2d');
  m.direction='rtl';m.font=F(34);
- const paras=unlatex(body).split('\n').map(par=>{const L=[];let l='';par.split(' ').forEach(w=>{const t=l?l+' '+w:w;if(m.measureText(t).width>W-2*P&&l){L.push(l);l=w}else l=t});L.push(l);return L});
+ const paras=(raw?body:unlatex(body)).split('\n').map(par=>{const L=[];let l='';par.split(' ').forEach(w=>{const t=l?l+' '+w:w;if(m.measureText(t).width>W-2*P&&l){L.push(l);l=w}else l=t});L.push(l);return L});
  const pages=[[]];let n=0;
  paras.forEach(p=>{if(n+p.length>MAX&&n>0&&p.length<=MAX){pages.push([]);n=0}p.forEach(l=>{if(n==0&&!l.trim())return;if(n>=MAX){pages.push([]);n=0}pages[pages.length-1].push(l);n++})});
- cardList=pages.filter(q=>q.length).map((L,i,a)=>{
+ const pgs=pages.filter(q=>q.length);
+ const C=cardCols();
+ cardList=(pgs.length?pgs:[[]]).map((L,i,a)=>{
   const H=Math.max(720,340+L.length*LH+110),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
-  const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,mix(getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0a0e1d','#000000',.2));g.addColorStop(1,'#1b2a5e');x.fillStyle=g;x.fillRect(0,0,W,H);
-  const b=x.createLinearGradient(0,0,W,0);b.addColorStop(0,T&&curTheme().pri);b.addColorStop(1,curTheme().pri2);x.fillStyle=b;x.fillRect(0,0,W,14);
+  const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,C.bg1);g.addColorStop(1,C.bg2);x.fillStyle=g;x.fillRect(0,0,W,H);
+  const b=x.createLinearGradient(0,0,W,0);b.addColorStop(0,C.a1);b.addColorStop(1,C.a2);x.fillStyle=b;x.fillRect(0,0,W,14);
   x.direction='rtl';x.textAlign='right';
-  x.fillStyle='#67e8f9';x.font=F(30,700);x.fillText(a.length>1?`${sub} · ${i+1}/${a.length}`:sub,W-P,120);
-  x.fillStyle='#fff';x.font=F(48,800);x.fillText(title,W-P,196);
-  x.fillStyle='#e8ecff';x.font=F(34);L.forEach((l,j)=>x.fillText(l,W-P,300+j*LH));
-  x.fillStyle='#8b96b8';x.font=F(24);x.textAlign='center';x.fillText('Student Assistor',W/2,H-44);
+  x.fillStyle=C.sub;x.font=F(30,700);x.fillText(a.length>1?`${sub} · ${i+1}/${a.length}`:sub,W-P,120);
+  x.fillStyle=C.title;let z=48;x.font=F(z,800);while(z>24&&x.measureText(title).width>W-2*P)x.font=F(z-=2,800);x.fillText(title,W-P,196);
+  x.fillStyle=C.body;x.font=F(34);L.forEach((l,j)=>x.fillText(l,W-P,300+j*LH));
+  x.fillStyle=C.foot;x.font=F(24);x.textAlign='center';x.fillText('Student Assistor',W/2,H-44);
   return{url:c.toDataURL('image/png'),name:`${fn}${a.length>1?'-'+(i+1):''}.png`}
  });
  const g=$('#cg');g.innerHTML='';
  cardList.forEach((cd,i)=>{const d=document.createElement('div');d.className='book';d.style.cursor='default';d.innerHTML='<img style="width:100%;border-radius:10px;border:1px solid var(--bd)"><button class="g" style="margin-top:10px;width:100%">⬇ تحميل</button>';d.querySelector('img').src=cd.url;d.querySelector('button').onclick=()=>dl(i);g.append(d)});
- M('mCards',1);if(cardList.length>1)toast(`قُسّم المحتوى إلى ${cardList.length} بطاقات 🖼`);
+ syncCC();M('mCards',1);if(cardList.length>1&&!quiet)toast(`قُسّم المحتوى إلى ${cardList.length} بطاقات 🖼`);
 }
 function dl(i){const a=document.createElement('a');a.href=cardList[i].url;a.download=cardList[i].name;a.click()}
 async function dlAll(){for(let i=0;i<cardList.length;i++){dl(i);await sleep(450)}}
@@ -495,23 +537,55 @@ async function act(a,w){
  else if(a=='pdf')printHTML(o.kind,pdfBody(o,sub));
  else{await put('notes',{book:o.book,page:o.pg,kind:o.kind,text:o.t,date:Date.now()});toast('تم الحفظ في ملاحظاتي 💾')}
 }
+/* ---------- ملاحظة جديدة ---------- */
+const noteDate=d=>new Date(d).toLocaleDateString('ar',{year:'numeric',month:'long',day:'numeric'}),fnm=s=>s.replace(/[\\/:*?"<>|]/g,'').trim().slice(0,40)||'note';
+let editX=null;
+const subOf=x=>x.own?noteDate(x.date):`${x.book} · صفحة ${x.page}`;
+function noteImg(x,t=x.text){x.own?cardImg(x.title,subOf(x),t,fnm(x.title),1):cardImg(x.kind,subOf(x),plain(t),x.book+'-p'+x.page)}
+function noteUI(){const e=editX,ob=e&&!e.own;$('#mNew h2').textContent=e?'✏️ تعديل الملاحظة':'✍️ ملاحظة جديدة';$('#nt').parentNode.style.display=ob?'none':'';$('#ns').textContent=e?'💾 حفظ التعديل':'💾 حفظ'}
+function newNote(){if(editX){editX=null;$('#nt').value=$('#nb').value=''}noteUI();M('mNew',1);setTimeout(()=>$('#nt').focus(),60)}
+async function editNote(id){const x=await get('notes',id);if(!x)return;editX=x;$('#nt').value=x.own?x.title:'';$('#nb').value=x.text;noteUI();M('mNew',1);setTimeout(()=>$('#nb').focus(),60)}
+function noteVal(){const e=editX,ob=e&&!e.own,t=ob?e.kind:$('#nt').value.trim(),b=$('#nb').value.trim();if(ob?!b:(!t&&!b)){toast('اكتب عنواناً أو نصاً أولاً');return null}return{t:t||'ملاحظة',b}}
+async function saveNew(){const v=noteVal();if(!v)return;
+ if(editX){await put('notes',{...editX,text:v.b,...(editX.own?{title:v.t,book:v.t}:{}),edited:Date.now()});toast('تم حفظ التعديل ✅')}
+ else{await put('notes',{own:1,book:v.t,title:v.t,page:0,kind:'ملاحظة',text:v.b,date:Date.now()});toast('تم الحفظ في ملاحظاتي 💾')}
+ editX=null;$('#nt').value=$('#nb').value='';noteUI();M('mNew',0);if(openM.includes('mNotes'))openNotes()}
+function newImg(){const v=noteVal();if(!v)return;editX?noteImg({...editX,title:v.t},v.b):cardImg(v.t,noteDate(Date.now()),v.b,fnm(v.t),1)}
+async function newCopy(){const v=noteVal();if(!v)return;await navigator.clipboard.writeText(v.t+'\n\n'+v.b);toast('تم النسخ 📋')}
 const copyTr=()=>{navigator.clipboard.writeText(unlatex($('#tr').dataset.t||''));toast('تم النسخ 📋')};
 async function saveTr(){const t=$('#tr').dataset.t||'';if(!cur.pdf||!t)return toast('لا توجد ترجمة لحفظها');await put('notes',{book:cur.name||'كتاب',page:cur.n,kind:'ترجمة الصفحة',text:t,date:Date.now()});toast('تم الحفظ في ملاحظاتي 💾')}
+let nCat='all';
+const inCat=x=>nCat=='all'||(nCat=='own')==!!x.own;
 async function openNotes(){
- M('mNotes',1);const q=$('#nq').value.trim().toLowerCase(),l=$('#nl');
- let n=(await all('notes')).sort((a,b)=>a.book.localeCompare(b.book)||a.page-b.page||a.date-b.date);
- if(q)n=n.filter(x=>(x.book+x.kind+x.text).toLowerCase().includes(q));
- l.innerHTML=n.length?'':'<p style="color:var(--mut)">لا توجد ملاحظات بعد. احفظ شرحاً أو ترجمة وستظهر هنا 🗂</p>';
- n.forEach(x=>{
-  const d=document.createElement('div'),sub=`${x.book} · صفحة ${x.page}`;d.className='card';d.style.margin='0 0 12px';
-  d.innerHTML='<div class="nh"></div><div class="pre nt"></div><div class="row"><button class="s">🖼 بطاقة صورة</button><button class="s">📋 نسخ</button><button class="s">📄 PDF</button><button class="r">🗑 حذف</button></div>';
-  d.querySelector('.nh').textContent=sub+' · '+x.kind;d.querySelector('.nt').innerHTML=md(x.text);math(d.querySelector('.nt'));
-  const [a,b,c,e]=d.querySelectorAll('button');
-  a.onclick=()=>cardImg(x.kind,sub,plain(x.text),x.book+'-p'+x.page);
-  b.onclick=()=>{navigator.clipboard.writeText(unlatex(plain(x.text)));toast('تم النسخ 📋')};
-  c.onclick=()=>printHTML(x.kind,pdfBody(x,sub));
+ M('mNotes',1);const q=$('#nq').value.trim().toLowerCase(),l=$('#nl'),tabs=$('#nc');
+ let n=await all('notes');
+ if(q)n=n.filter(x=>((x.book||'')+(x.kind||'')+(x.title||'')+x.text).toLowerCase().includes(q));
+ const no=n.filter(x=>x.own).length;tabs.innerHTML='';
+ [['all','🗂 الكل',n.length],['book','📚 من الكتب',n.length-no],['own','✍️ كتبتها أنا',no]].forEach(([k,t,c])=>{const b=document.createElement('button');b.className=nCat==k?'':'s';b.textContent=`${t} (${c})`;b.onclick=()=>{nCat=k;openNotes()};tabs.append(b)});
+ n=n.filter(inCat);l.innerHTML='';
+ if(!n.length){l.innerHTML='<p style="color:var(--mut)">'+(q?'لا توجد نتائج مطابقة 🔎':nCat=='own'?'ما كتبت أي ملاحظة بعد. اضغط «جديدة» ✍️':nCat=='book'?'لا توجد ملاحظات من الكتب. احفظ شرحاً أو ترجمة وستظهر هنا 📚':'لا توجد ملاحظات بعد. احفظ شرحاً أو ترجمة، أو اكتب ملاحظة جديدة ✍️')+'</p>';return}
+ const H=(t,big)=>{const h=document.createElement('h3');h.textContent=t;h.style.cssText=big?'margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--bd);color:var(--pri)':'margin:12px 0 6px;color:var(--pri2)';l.append(h)};
+ const card=x=>{
+  const own=!!x.own,d=document.createElement('div'),sub=subOf(x),ttl=own?x.title:x.kind;d.className='card';d.style.margin='0 0 12px';
+  d.innerHTML='<div class="nh"></div><div class="pre nt"></div><div class="row"><button class="s">🖼 بطاقة صورة</button><button class="s">✏️ تعديل</button><button class="s">📋 نسخ</button><button class="s">📄 PDF</button><button class="r">🗑 حذف</button></div>';
+  d.querySelector('.nh').textContent=(own?'📝 '+x.title+' · '+sub:sub+' · '+x.kind)+(x.edited?' · معدّلة':'');
+  d.querySelector('.nt').innerHTML=md(x.text);math(d.querySelector('.nt'));
+  const [a,ed,b,c,e]=d.querySelectorAll('button');
+  a.onclick=()=>noteImg(x);ed.onclick=()=>editNote(x.id);
+  b.onclick=()=>{navigator.clipboard.writeText(own?x.title+'\n\n'+x.text:unlatex(plain(x.text)));toast('تم النسخ 📋')};
+  c.onclick=()=>printHTML(ttl,pdfBody({kind:ttl,t:x.text},sub));
   e.onclick=async()=>{await del('notes',x.id);openNotes()};
-  l.append(d)});
+  l.append(d)};
+ const mine=n.filter(x=>x.own).sort((a,b)=>b.date-a.date),bk=n.filter(x=>!x.own).sort((a,b)=>(a.book||'').localeCompare(b.book||'')||a.page-b.page||a.date-b.date);
+ if(mine.length){if(nCat=='all')H('✍️ كتبتها أنا ('+mine.length+')',1);mine.forEach(card)}
+ if(bk.length){if(nCat=='all')H('📚 من الكتب ('+bk.length+')',1);let last;bk.forEach(x=>{if(x.book!==last){H('📕 '+x.book);last=x.book}card(x)})}
+}
+async function expNotes(){
+ const n=(await all('notes')).filter(inCat).sort((a,b)=>a.date-b.date);
+ if(!n.length)return toast('لا توجد ملاحظات للتصدير');
+ const iso=d=>d?new Date(d).toISOString():null;
+ const o=n.map(x=>x.own?{category:'كتبتها أنا',type:'own',title:x.title,text:x.text,createdAt:iso(x.date),updatedAt:iso(x.edited)}:{category:'من الكتب',type:'book',book:x.book,page:x.page,kind:x.kind,text:x.text,createdAt:iso(x.date),updatedAt:iso(x.edited)});
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o,null,2)],{type:'application/json'}));a.download='notes-'+{all:'all',book:'books',own:'mine'}[nCat]+'.json';a.click();toast(`تم تصدير ${n.length} ملاحظة ⬇`);
 }
 
 /* ---------- Esc + منع تغيير الرقم بالعجلة ---------- */
