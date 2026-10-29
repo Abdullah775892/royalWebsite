@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&family=IBM+Plex+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
 <style>
-:root{--prid:#4f46e5;--glow:#6366f155;--glow2:#6366f188;--glow3:#6366f133;--glow4:#06b6d433;--ff:Cairo;--bg:#f3f6fc;--card:#ffffffcc;--tx:#12182b;--mut:#64708a;--pri:#6366f1;--pri2:#06b6d4;--bd:#d9e0ee;--fs:1.1rem}
+:root{--prid:#4f46e5;--glow:#6366f155;--glow2:#6366f188;--glow3:#6366f133;--glow4:#06b6d433;--ff:'IBM Plex Sans Arabic';--bg:#f3f6fc;--card:#ffffffcc;--tx:#12182b;--mut:#64708a;--pri:#6366f1;--pri2:#06b6d4;--bd:#d9e0ee;--fs:1.1rem}
 [data-theme=dark]{--bg:#0a0e1d;--card:#131a33cc;--tx:#e8ecff;--mut:#8b96b8;--bd:#25305a}
 *{box-sizing:border-box;margin:0}
 body{font-family:var(--ff),system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;transition:.4s}
@@ -113,6 +113,9 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .o{background:linear-gradient(135deg,#f59e0b,#d97706)}
 .pre{white-space:pre-wrap;line-height:2;font-size:var(--fs);padding:12px;margin-bottom:12px;border:1px solid var(--bd);border-radius:12px;background:var(--card)}
 .pre:empty{display:none}.pre h3{margin:10px 0 4px;color:var(--pri2)}
+#rsel{padding:10px;border:1px dashed var(--pri2);border-radius:12px}
+#rsel label{min-width:0;display:flex;align-items:center;gap:6px;color:var(--tx);cursor:pointer}
+#rsel input{flex:none;min-width:0;width:auto}
 @media(max-width:700px){
 .ctl{flex-direction:column;align-items:stretch;gap:12px}
 .nv{display:grid;grid-template-columns:1fr 1fr}.nv .pgw{grid-column:1/-1;order:-1}
@@ -155,6 +158,7 @@ th,td{padding:6px;font-size:.85rem}
 <h1><img id="logo" width="36" height="36"> Student Assistor</h1>
 <nav id="nav">
 <button onclick="openLib()"><i>📚</i><span>المكتبة</span></button>
+<button onclick="openGal()"><i>🖼</i><span>مكتبة الصور</span></button>
 <button onclick="openVoc()"><i>📒</i><span>المفردات</span></button>
 <button onclick="openNotes()"><i>🗂</i><span>ملاحظاتي</span></button>
 <button onclick="newNote()"><i>✍️</i><span>ملاحظة جديدة</span></button>
@@ -197,6 +201,25 @@ th,td{padding:6px;font-size:.85rem}
 
 <div class="modal" id="mSet"><div class="box"><h2>⚙️ الإعدادات</h2>
 <h3>الذكاء الاصطناعي</h3>
+<div class="row"><label>المزود</label><select id="prov"><option value="gemini">Gemini (سحابي)</option><option value="ollama">Ollama (محلي ومجاني)</option></select></div>
+<div id="olBox" style="display:none">
+<div class="row"><label>رابط Ollama</label><input id="ourl" dir="ltr" placeholder="http://localhost:11434"></div>
+<div class="row"><label>🌐 نموذج الترجمة</label><select id="omT"></select></div>
+<div class="row"><label>💡 نموذج الشرح</label><select id="omE"></select></div>
+<div class="row"><label>⚡ نموذج السرعة</label><select id="omF"></select></div>
+<div class="row"><label><input type="checkbox" id="ofast"> وضع السرعة: استخدم نموذج السرعة للترجمة والشرح</label></div>
+<div class="row"><label>حجم السياق</label><select id="nctx"><option>4096</option><option>8192</option><option>16384</option></select></div>
+<div class="row"><label><input type="checkbox" id="par"> 🧩 التشغيل المتوازي: قسّم الصفحة على أكثر من نموذج</label></div>
+<div class="row"><label>النماذج المشاركة</label><details id="poolD" style="flex:1"><summary id="poolS" style="cursor:pointer;padding:10px 14px;border:1px solid var(--bd);border-radius:12px">اختر النماذج</summary><div id="poolL" style="padding:8px"></div></details></div>
+<div class="row"><label>عدد الأجزاء المتزامنة</label><select id="pc"><option>2</option><option>3</option><option>4</option><option>6</option></select></div>
+<div class="row"><label>🖼 نموذج صور (اختياري)</label><select id="ovm"></select></div>
+<div class="row"><button class="s" onclick="listOll()">🔄 جلب النماذج المثبّتة</button></div>
+<datalist id="oml"></datalist>
+<details style="color:var(--mut);line-height:2"><summary>⚙️ طريقة التشغيل</summary>
+1) نزّل النماذج: <code dir="ltr">ollama pull qwen2.5:7b</code> · <code dir="ltr">ollama pull gemma2:9b</code> · <code dir="ltr">ollama pull qwen2.5:3b</code><br>
+2) فعّل السماح للموقع (CORS) ثم أعد تشغيل Ollama:<br>ويندوز: <code dir="ltr">setx OLLAMA_ORIGINS "*"</code><br>ماك: <code dir="ltr">launchctl setenv OLLAMA_ORIGINS "*"</code><br>لينكس: أضف <code dir="ltr">Environment="OLLAMA_ORIGINS=*"</code> في خدمة systemd<br>
+3) النماذج النصية تقرأ نص الـPDF مباشرة. الصفحات الممسوحة وقص الأجزاء تحتاج «نموذج صور».<br>4) للتشغيل المتوازي اضبط <code dir="ltr">OLLAMA_NUM_PARALLEL</code> (عدد الأجزاء ÷ عدد النماذج) و<code dir="ltr">OLLAMA_MAX_LOADED_MODELS</code> (عدد النماذج المشاركة).</details>
+</div>
 <div class="row"><label>مفتاح Gemini</label><input id="key" type="password" placeholder="API Key"></div>
 <div class="row"><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--pri2);text-decoration:none">🔑 احصل على مفتاح Gemini API مجاناً من Google AI Studio ↗</a></div>
 <div class="row"><label>النموذج</label><select id="model"></select><button class="s" onclick="listModels()">🔄 تحديث من حسابي</button></div>
@@ -237,6 +260,10 @@ th,td{padding:6px;font-size:.85rem}
 <h3>الترجمة</h3><div class="pre" id="rt"></div>
 <div class="row"><button class="o" onclick="askLvl(o=>explain(null,selData.o||selData.t,$('#rx'),o))">💡 شرح</button><button onclick="selVoc()">📒 للمفردات</button><button class="s" onclick="copyT()">📋 نسخ الترجمة</button><button class="s" onclick="M('mRes',0)">إغلاق</button></div>
 <div class="pre" id="rx"></div>
+<div class="row" id="rsel"><b style="color:var(--mut)">اختر ما يدخل في النسخ / الصورة / PDF / الحفظ:</b>
+<label><input type="checkbox" id="kO"> النص الأصلي</label>
+<label><input type="checkbox" id="kT"> الترجمة</label>
+<label><input type="checkbox" id="kX"> الشرح</label></div>
 <div class="row"><button class="s" onclick="act('copy','res')">📋 نسخ</button><button class="s" onclick="act('img','res')">🖼 صورة</button><button class="s" onclick="act('pdf','res')">📄 PDF</button><button class="g" onclick="act('save','res')">💾 حفظ</button></div></div></div>
 <div class="modal" id="mExp"><div class="box"><h2 id="exT">💡 الشرح</h2><div class="pre" id="ex"></div>
 <div class="row"><button class="s" onclick="act('copy','ex')">📋 نسخ</button><button class="s" onclick="act('img','ex')">🖼 صورة</button><button class="s" onclick="act('pdf','ex')">📄 PDF</button><button class="g" onclick="act('save','ex')">💾 حفظ</button></div>
@@ -264,7 +291,16 @@ th,td{padding:6px;font-size:.85rem}
 <div class="row"><label>الخلفية</label><select id="tb"><option value="dark">داكنة 🌙</option><option value="light">فاتحة ☀️</option></select><input id="tn" placeholder="اسم الثيم"></div>
 <div class="row"><button class="g" onclick="saveTheme()">💾 حفظ كثيم جديد</button><button class="s" onclick="closeTheme()">إغلاق</button></div></div></div>
 <div class="modal" id="mCards"><div class="box"><h2>🖼 بطاقات الصور</h2>
-<div class="row cc"><label>الألوان</label><select id="cp"></select><label>الخلفية</label><input type="color" id="c1" title="لون الخلفية (بداية)"><input type="color" id="c2" title="لون الخلفية (نهاية)"><label>التمييز</label><input type="color" id="c3" title="لون التمييز 1"><input type="color" id="c4" title="لون التمييز 2"><label>النص</label><input type="color" id="c5" title="لون النص"><label><input type="checkbox" id="cau"> تلقائي</label></div><div class="row"><button class="g" onclick="dlAll()">⬇ تحميل الكل</button><button class="s" onclick="M('mCards',0)">إغلاق</button></div><div class="shelf" id="cg" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr))"></div></div></div>
+<div class="row cc"><label>الألوان</label><select id="cp"></select><label>الخلفية</label><input type="color" id="c1" title="لون الخلفية (بداية)"><input type="color" id="c2" title="لون الخلفية (نهاية)"><label>التمييز</label><input type="color" id="c3" title="لون التمييز 1"><input type="color" id="c4" title="لون التمييز 2"><label>النص</label><input type="color" id="c5" title="لون النص"><label><input type="checkbox" id="cau"> تلقائي</label></div>
+<div class="row"><input id="et" dir="auto" placeholder="عنوان البطاقة"><input id="es" dir="auto" placeholder="العنوان الفرعي"></div>
+<div class="row"><textarea id="eb" dir="auto" style="min-height:150px" placeholder="✏️ عدّل نص البطاقة هنا والصورة تتحدث مباشرة"></textarea></div>
+<div class="row"><button class="s" onclick="tagL('[L]')">⬅ من اليسار</button><button class="s" onclick="tagL('[R]')">➡ من اليمين</button><button class="s" onclick="tagL('')">↺ تلقائي</button><button class="s" onclick="ins('س: ')">❓ سؤال</button><button class="s" onclick="ins('ج: ')">✅ جواب</button><button class="s" onclick="ins('[!] ')">⚠️ ملاحظة هامة</button></div>
+<div class="row"><label style="min-width:0;display:flex;gap:6px;align-items:center"><input type="checkbox" id="qaBox" style="flex:none;min-width:0;width:auto"> صناديق ملونة للسؤال والجواب</label><button class="g" onclick="saveGal()">🖼 حفظ في مكتبة الصور</button></div>
+<div class="row" style="color:var(--mut);font-size:.85rem">حدّد الأسطر ثم اضغط اتجاه الكتابة. «سؤال/جواب/ملاحظة» تُدرج عند المؤشر (أو تحوّل النص المحدد)، والسطر الفارغ ينهي الصندوق.</div>
+<div class="row"><button class="g" onclick="dlAll()">⬇ تحميل الكل</button><button class="s" onclick="M('mCards',0)">إغلاق</button></div><div class="shelf" id="cg" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr))"></div></div></div>
+<div class="modal" id="mGal"><div class="box"><h2>🖼 مكتبة الصور</h2>
+<div class="row"><input id="gq" placeholder="ابحث في المكتبة..." oninput="openGal()"><button class="s" onclick="M('mGal',0)">إغلاق</button></div>
+<div class="shelf" id="gl" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))"></div></div></div>
 <div id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -277,7 +313,7 @@ const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const ICON='data:image/svg+xml,'+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#6366f1'/><stop offset='1' stop-color='#06b6d4'/></linearGradient></defs><rect width='64' height='64' rx='16' fill='url(#g)'/><path d='M32 22c-5-3-12-3-18-1v25c6-2 13-2 18 1 5-3 12-3 18-1V21c-6-2-13-2-18 1z' fill='#fff'/><path d='M32 22v25' stroke='#6366f1' stroke-width='2.5'/><path d='M46 8l1.8 5L53 15l-5.2 1.8L46 22l-1.8-5.2L39 15l5.2-2z' fill='#fde68a'/></svg>");
 document.querySelector('link[rel=icon]').href=ICON;['#logo','#lg'].forEach(q=>$(q).src=ICON);
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-const DB=new Promise(r=>{const q=indexedDB.open('sa',2);q.onupgradeneeded=()=>{const d=q.result,mk=(n,o)=>d.objectStoreNames.contains(n)||d.createObjectStore(n,o);mk('cache',{keyPath:'id'});mk('books',{keyPath:'id'});mk('vocab',{keyPath:'id',autoIncrement:true});mk('notes',{keyPath:'id',autoIncrement:true})};q.onsuccess=()=>r(q.result)});
+const DB=new Promise(r=>{const q=indexedDB.open('sa',3);q.onupgradeneeded=()=>{const d=q.result,mk=(n,o)=>d.objectStoreNames.contains(n)||d.createObjectStore(n,o);mk('cache',{keyPath:'id'});mk('books',{keyPath:'id'});mk('vocab',{keyPath:'id',autoIncrement:true});mk('notes',{keyPath:'id',autoIncrement:true});mk('imgs',{keyPath:'id',autoIncrement:true})};q.onsuccess=()=>r(q.result)});
 const tx=async(s,m,f)=>{const d=await DB;return new Promise((res,rej)=>{const t=d.transaction(s,m),o=f(t.objectStore(s));t.oncomplete=()=>res(o.result);t.onerror=rej})};
 const put=(s,v)=>tx(s,'readwrite',o=>o.put(v)),get=(s,k)=>tx(s,'readonly',o=>o.get(k)),all=s=>tx(s,'readonly',o=>o.getAll()),del=(s,k)=>tx(s,'readwrite',o=>o.delete(k)),clr=s=>tx(s,'readwrite',o=>o.clear());
 let toastT;const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),3000)};
@@ -313,9 +349,10 @@ addEventListener('load',()=>setTimeout(()=>$('#load').classList.add('h'),1100));
 
 /* ---------- الإعدادات ---------- */
 const ORDER=['gemini-3.7-flash','gemini-3.6-flash','gemini-3.5-flash','gemini-3.5-flash-lite','gemini-3.1-flash-lite','gemini-2.5-flash','gemini-2.5-flash-lite'];
-let S=Object.assign({key:'',model:'gemini-3.7-flash',fb:true,lang:'العربية',style:'n',terms:true,fs:18,before:3,after:3,compat:true,lvl:'متوسط',len:'متوازن',ask:true,mnav:'slider',font:'cairo'},JSON.parse(localStorage.S||'{}'));
+let S=Object.assign({key:'',model:'gemini-3.7-flash',fb:true,lang:'العربية',style:'n',terms:true,fs:18,before:3,after:3,compat:true,lvl:'متوسط',len:'متوازن',ask:true,mnav:'slider',font:'plex'},JSON.parse(localStorage.S||'{}'));
+if(S.fv!==2){S.font='plex';S.fv=2;localStorage.S=JSON.stringify(S)}
 function fillModels(extra=[]){const sel=$('#model');const list=[...new Set([...ORDER,...extra,S.model])];sel.innerHTML=list.map(m=>`<option>${m}</option>`).join('');sel.value=S.model}
-function applySet(){fillModels();$('#key').value=S.key;$('#fb').checked=S.fb;$('#lang').value=S.lang;$('#style').value=S.style;$('#terms').checked=S.terms;$('#fs').value=S.fs;$('#compat').checked=S.compat;$('#lvl').value=S.lvl;$('#len').value=S.len;$('#ask').checked=S.ask;$('#mnav').value=S.mnav;$('#font').value=S.font;document.querySelectorAll('.pre-b').forEach(e=>e.value=S.before);document.querySelectorAll('.pre-a').forEach(e=>e.value=S.after);document.body.classList.remove('m-slider','m-bar','m-drawer');document.body.classList.add('m-'+S.mnav);const r=document.documentElement.style;r.setProperty('--fs',S.fs/16+'rem');r.setProperty('--ff',S.font=='plex'?"'IBM Plex Sans Arabic'":'Cairo')}
+function applySet(){fillModels();$('#key').value=S.key;$('#fb').checked=S.fb;$('#lang').value=S.lang;$('#style').value=S.style;$('#terms').checked=S.terms;$('#fs').value=S.fs;$('#compat').checked=S.compat;$('#lvl').value=S.lvl;$('#len').value=S.len;$('#ask').checked=S.ask;$('#mnav').value=S.mnav;$('#font').value=S.font;document.querySelectorAll('.pre-b').forEach(e=>e.value=S.before);document.querySelectorAll('.pre-a').forEach(e=>e.value=S.after);document.body.classList.remove('m-slider','m-bar','m-drawer');document.body.classList.add('m-'+S.mnav);const r=document.documentElement.style;r.setProperty('--fs',S.fs/16+'rem');r.setProperty('--ff',S.font=='cairo'?'Cairo':"'IBM Plex Sans Arabic'")}
 function saveSet(){S={...S,key:$('#key').value.trim(),model:$('#model').value,fb:$('#fb').checked,lang:$('#lang').value,style:$('#style').value,terms:$('#terms').checked,fs:+$('#fs').value,compat:$('#compat').checked,lvl:$('#lvl').value,len:$('#len').value,ask:$('#ask').checked,mnav:$('#mnav').value,font:$('#font').value};localStorage.S=JSON.stringify(S);applySet();toast('تم الحفظ ✅')}
 $('#fs').oninput=e=>document.documentElement.style.setProperty('--fs',e.target.value/16+'rem');
 async function listModels(){
@@ -326,6 +363,42 @@ async function listModels(){
 }
 applySet();$('#mSet').addEventListener('change',()=>saveSet());
 document.querySelectorAll('.pre-b,.pre-a').forEach(i=>i.onchange=()=>{const v=Math.max(0,Math.min(20,+i.value||0)),b=i.classList.contains('pre-b');S[b?'before':'after']=v;localStorage.S=JSON.stringify(S);document.querySelectorAll(b?'.pre-b':'.pre-a').forEach(e=>e.value=v)});
+
+/* ---------- Ollama (محلي) ---------- */
+S=Object.assign({prov:'gemini',ourl:'http://localhost:11434',omT:'qwen2.5:7b',omE:'gemma2:9b',omF:'qwen2.5:3b',fast:false,ovm:'',par:false,pc:3,pool:[],nctx:'8192'},S);if(S.prov!='ollama')S.prov='gemini';
+const OLI=['ourl','omT','omE','omF','ovm','nctx'],OPRE=['qwen2.5:7b','llama3.1:8b','gemma2:9b','qwen2.5:3b','llama3.2:3b'];
+let INST=[];
+function poolSum(){const n=(S.pool||[]).length;$('#poolS').textContent=n?`النماذج المشاركة (${n}): ${S.pool.join('، ')}`:'النماذج المشاركة: نموذج الترجمة فقط'}
+function fillSel(){
+ const L=INST.length?INST:OPRE;
+ ['omT','omE','omF','ovm'].forEach(id=>{const e=$('#'+id),v=S[id]||'',l=[...new Set([...L,...(v?[v]:[])])];
+  e.innerHTML=(id=='ovm'?'<option value="">— بدون —</option>':'')+l.map(m=>`<option value="${m}">${m}${INST.length&&!INST.includes(m)?' (غير مثبّت)':''}</option>`).join('');e.value=v});
+ const P=$('#poolL');P.innerHTML='';
+ L.forEach(m=>{const l=document.createElement('label');l.style.cssText='display:flex;gap:6px;align-items:center;min-width:0;margin:4px 0;color:var(--tx)';l.innerHTML='<input type="checkbox" style="flex:none;min-width:0;width:auto"><span></span>';const i=l.querySelector('input');i.value=m;i.checked=(S.pool||[]).includes(m);l.querySelector('span').textContent=m;P.append(l)});
+ poolSum();
+}
+const fillOl=(x=[])=>{INST=x;fillSel()};
+function applyOl(){$('#prov').value=S.prov;OLI.forEach(i=>$('#'+i).value=S[i]);$('#ofast').checked=S.fast;$('#par').checked=S.par;$('#pc').value=S.pc;$('#olBox').style.display=S.prov!='gemini'?'':'none'}
+function saveOl(){S.prov=$('#prov').value;OLI.forEach(i=>S[i]=$('#'+i).value.trim());S.fast=$('#ofast').checked;S.par=$('#par').checked;S.pc=+$('#pc').value;S.pool=[...document.querySelectorAll('#poolL input:checked')].map(i=>i.value);poolSum();localStorage.S=JSON.stringify(S);$('#olBox').style.display=S.prov!='gemini'?'':'none'}
+fillOl();applyOl();$('#mSet').addEventListener('change',saveOl);$('#prov').addEventListener('change',()=>{if($('#prov').value!='gemini')listOll(1)});if(S.prov!='gemini')listOll(1);
+async function listOll(q){saveOl();try{const j=await(await fetch(S.ourl.replace(/\/$/,'')+'/api/tags')).json(),ms=(j.models||[]).map(m=>m.name);fillOl(ms);applyOl();if(!q)toast(`وُجد ${ms.length} نموذج مثبّت ✅`)}catch{if(!q)toast('تعذر الاتصال بـ Ollama: شغّله وتأكد من OLLAMA_ORIGINS')}}
+async function parTr(text){
+ const pr=TP().replace('الموجودة في هذه الصورة','التالي').replace('الموجود في هذه الصورة','التالي'),ch=[];let c='';
+ text.split(/\n+/).filter(l=>l.trim()).forEach(l=>{if(c.length+l.length>700&&c){ch.push(c);c=''}c+=(c?'\n':'')+l});if(c)ch.push(c);
+ const pool=S.pool&&S.pool.length?S.pool:[S.fast?S.omF:S.omT],out=new Array(ch.length);let i=0;
+ const w=async()=>{while(i<ch.length){const k=i++;out[k]=await oll(null,pr+'\n\n'+ch[k],0,'t',pool[k%pool.length])}};
+ await Promise.all(Array.from({length:Math.min(S.pc||3,ch.length)},w));
+ return out.join('\n');
+}
+async function oll(b64,prompt,json,task,fm){
+ const sg=ac.signal,mo=fm||(b64?S.ovm:S.fast?S.omF:task=='e'?S.omE:S.omT);
+ if(!mo)throw Error('هذا الإجراء يحتاج صورة: اكتب اسم «نموذج صور» (مثل llama3.2-vision) في الإعدادات، أو استخدم Gemini');
+ let r;try{r=await fetch(S.ourl.replace(/\/$/,'')+'/api/chat',{method:'POST',signal:sg,headers:{'Content-Type':'application/json'},body:JSON.stringify({model:mo,stream:false,...(/qwen3/.test(mo)?{think:false}:{}),...(json?{format:'json'}:{}),options:{temperature:.3,num_ctx:+S.nctx||8192},messages:[{role:'user',content:prompt,...(b64?{images:[b64]}:{})}]})})}
+ catch{if(sg.aborted)throw STOP();throw Error('تعذر الاتصال بـ Ollama: شغّله وتأكد من OLLAMA_ORIGINS=* (الإعدادات ← طريقة التشغيل)')}
+ const j=await r.json().catch(()=>({}));if(!r.ok)throw Error((j.error||'خطأ '+r.status).slice(0,140)+(/context/i.test(j.error||'')?'\nارفع «حجم السياق» من الإعدادات':''));
+ return j.message?.content||'(لا يوجد نص)';
+}
+async function pText(n){const p=await cur.pdf.getPage(n),c=await p.getTextContent();let o='',y;c.items.forEach(i=>{const yy=i.transform[5];if(y!==undefined&&Math.abs(yy-y)>4)o+='\n';o+=i.str+(i.hasEOL?'\n':' ');y=yy});o=o.trim();if(!o)throw Error('الصفحة صورة ممسوحة بلا نص: استخدم Gemini أو حدّد «نموذج صور»');return o}
 
 /* ---------- Gemini مع التحويل التلقائي ---------- */
 const STY={n:'بأسلوب طبيعي سلس',a:'بأسلوب أكاديمي دقيق',l:'ترجمة حرفية قريبة من النص',e:'بأسلوب مبسّط يناسب الطلاب'};
@@ -339,7 +412,8 @@ function stopAll(){
  toast('⏹ تم إيقاف كل شيء');
 }
 function retrans(){if(!cur.pdf)return;$('#tr').innerHTML=dots;$('#tr').dataset.t='';show(cur.n,true)}
-async function gem(b64,prompt,json){
+async function gem(b64,prompt,json,task){
+ if(S.prov=='ollama')return oll(b64,prompt,json,task);
  if(!S.key){M('mSet',1);throw Error('أدخل مفتاح Gemini أولاً من الإعدادات')}
  const sg=ac.signal,i=ORDER.indexOf(S.model);
  const chain=[S.model,...(S.fb?(i<0?ORDER:ORDER.slice(i+1)):[])],errs=[];
@@ -362,7 +436,7 @@ const b64=c=>c.toDataURL('image/jpeg',.85).split(',')[1];
 let cur={id:null,pdf:null,n:1,t:0,book:null},tok=0;
 async function load(buf,id,start=1,name=''){
  $('#fn').textContent=cur.name=name;
- cur.pdf=await pdfjsLib.getDocument({data:buf,disableFontFace:S.compat,useSystemFonts:false}).promise;
+ cur.pdf=await pdfjsLib.getDocument({data:buf,disableFontFace:S.compat,useSystemFonts:!S.compat,standardFontDataUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/',cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',cMapPacked:true}).promise;
  cur.id=id;cur.t=cur.pdf.numPages;await go(start);
 }
 const pick=async f=>{if(!f)return;cur.book=null;await load(await f.arrayBuffer(),'f'+f.name+f.size,1,f.name.replace(/\.pdf$/i,''))};
@@ -383,12 +457,12 @@ async function go(n){
  $('#tr').innerHTML=dots;$('#tr').dataset.t='';
  prefetch(n);
 }
-const sig=()=>S.lang+S.style+(S.terms?1:0);
+const sig=()=>S.lang+S.style+(S.terms?1:0)+(S.prov=='ollama'?'o'+(S.par?'P'+(S.pool||[]).join(','):S.fast?S.omF:S.omT):'');
 async function trans(p,force){
  const k=cur.id+':'+p+':'+sig();
  if(!force){const h=await get('cache',k);if(h)return h.text}
  const c=document.createElement('canvas');await draw(p,c,1.8);
- const t=await gem(b64(c),TP());await put('cache',{id:k,text:t});return t;
+ let x='';if(S.prov=='ollama')x=await pText(p).catch(e=>{if(!S.ovm)throw e;return''});const t=x&&S.par?await parTr(x):x?await gem(null,TP().replace('الموجودة في هذه الصورة','التالي').replace('الموجود في هذه الصورة','التالي')+'\n\n'+x,0,'t'):await gem(b64(c),TP());await put('cache',{id:k,text:t});return t;
 }
 async function show(p,force){
  try{const t=await trans(p,force);if(p==cur.n)setTr(t)}
@@ -416,6 +490,8 @@ const dots='<div class="dots"><span></span><span></span><span></span></div>';
 const esc=t=>t.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const md=t=>esc(t).replace(/^#{1,4} (.*)$/gm,'<h3>$1</h3>').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^[*-] /gm,'• ');
 let selData={o:'',t:''};
+const PK=Object.assign({o:0,t:1,x:0},JSON.parse(localStorage.PK||'{}'));
+[['kO','o'],['kT','t'],['kX','x']].forEach(([id,k])=>{$('#'+id).checked=!!PK[k];$('#'+id).onchange=e=>{PK[k]=+e.target.checked;localStorage.PK=JSON.stringify(PK)}});
 async function selTr(c){
  const img=c.toDataURL('image/jpeg',.85);selData={o:'',t:''};
  $('#ri').src=img;$('#ro').textContent='';$('#rt').innerHTML=dots;$('#rx').innerHTML='';$('#rx').dataset.t='';M('mRes',1);
@@ -433,14 +509,14 @@ function lvlStart(){M('mLvl',0);lvlGo({lvl:$('#lvS').value,len:$('#lnS').value})
 async function explain(b64,txt,out,o={lvl:S.lvl,len:S.len}){
  out.innerHTML=dots;out.dataset.t='';
  const base=`${LV[o.lvl]}، ${LN[o.len]}. اشرح ${b64?'محتوى هذه الصفحة':'النص التالي'} بـ ${S.lang}: ابدأ بملخص قصير، ثم المفاهيم والمصطلحات الأساسية، ثم مثال إن لزم. استخدم عناوين قصيرة ونقاط.${MTH}`;
- try{const t=await gem(b64,txt?base+'\n\n'+txt:base);out.innerHTML=md(t);math(out);out.dataset.t=t;return t}catch(e){out.textContent=er(e);return ''}
+ try{const t=await gem(b64,txt?base+'\n\n'+txt:base,0,'e');out.innerHTML=md(t);math(out);out.dataset.t=t;return t}catch(e){out.textContent=er(e);return ''}
 }
 function explainPage(force){if(!cur.pdf)return toast('افتح ملف PDF أولاً');askLvl(o=>runPage(o,force))}
 async function runPage(o,force){
- const n=cur.n,k=`exp|${cur.id}|${n}|${S.lang}|${o.lvl}|${o.len}`,el=$('#ex');$('#exT').textContent='💡 شرح الصفحة '+n+' · '+o.lvl;M('mExp',1);
+ const n=cur.n,k=`exp|${cur.id}|${n}|${S.lang}|${o.lvl}|${o.len}|${S.prov=='gemini'?'g':S.fast?S.omF:S.omE}`,el=$('#ex');$('#exT').textContent='💡 شرح الصفحة '+n+' · '+o.lvl;M('mExp',1);
  const h=force?null:await get('cache',k);if(h){el.innerHTML=md(h.text);math(el);el.dataset.t=h.text;return}
  el.innerHTML=dots;el.dataset.t='';const c=document.createElement('canvas');await draw(n,c,1.8);
- const t=await explain(b64(c),'',el,o);if(t)put('cache',{id:k,text:t});
+ let t,x='';if(S.prov!='gemini'){try{x=await pText(n)}catch(e){if(!S.ovm){el.textContent=er(e);return}}}t=x?await explain(null,x,el,o):await explain(b64(c),'',el,o);if(t)put('cache',{id:k,text:t});
 }
 async function selVoc(){if(!selData.o&&!selData.t)return;await put('vocab',{w:(selData.o||'').trim(),t:(selData.t||'').trim(),star:false});toast('أضيفت للمفردات 📒')}
 const copyT=()=>{navigator.clipboard.writeText(selData.t||'');toast('تم النسخ')};
@@ -458,9 +534,9 @@ function startCrop(){
 function doCrop(){const c=cr.getCroppedCanvas();M('mCrop',0);selTr(c)}
 
 /* ---------- نسخ / صورة / PDF / ملاحظات / نوافذ ---------- */
-const plain=t=>t.replace(/[#*]/g,'').replace(/^- /gm,'• ');
+const plain=t=>t.replace(/^#{1,4} (.*)$/gm,'▪ $1').replace(/[#*]/g,'').replace(/^- /gm,'• ');
 function ask(msg,ok='نعم'){return new Promise(r=>{$('#aq').textContent=msg;$('#ay').textContent=ok;M('mAsk',1);$('#ay').onclick=()=>{M('mAsk',0);r(true)};$('#an').onclick=()=>{M('mAsk',0);r(false)}})}
-const KCSS='https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css',FNAME=()=>S.font=='plex'?'IBM Plex Sans Arabic':'Cairo';
+const KCSS='https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css',FNAME=()=>S.font=='cairo'?'Cairo':'IBM Plex Sans Arabic';
 function printHTML(t,h){const tmp=document.createElement('div');tmp.innerHTML=h;math(tmp);const f=document.createElement('iframe');f.style.cssText='position:fixed;width:0;height:0;border:0';document.body.append(f);const d=f.contentDocument;d.open();d.write(`<meta charset="utf-8"><title>${esc(t)}</title><link rel="stylesheet" href="${KCSS}"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;700&display=swap"><body dir="rtl" style="font-family:'${FNAME()}',Tahoma,sans-serif;padding:24px">${tmp.innerHTML}</body>`);d.close();setTimeout(()=>{f.contentWindow.print();setTimeout(()=>f.remove(),3000)},1400)}
 const GR={alpha:'α',beta:'β',gamma:'γ',delta:'δ',epsilon:'ε',theta:'θ',lambda:'λ',mu:'μ',pi:'π',rho:'ρ',sigma:'σ',tau:'τ',phi:'φ',omega:'ω',Omega:'Ω',Delta:'Δ',Sigma:'Σ',cdot:'·',times:'×',pm:'±',approx:'≈',neq:'≠',leq:'≤',geq:'≥',infty:'∞',rightarrow:'→',to:'→',partial:'∂',int:'∫',sum:'Σ',sqrt:'√',circ:'°',left:'',right:''};
 const SUP={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','+':'⁺','t':'ᵗ','n':'ⁿ'},SUB={'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'};
@@ -495,43 +571,112 @@ $('#cp').innerHTML=CPR.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join(
 $('#cp').onchange=e=>{const v=e.target.value;if(v=='c')return;const i=+v;if(i==0){CC.mode='auto';CC.p=0}else Object.assign(CC,CPR[i][1],{mode:'custom',p:i,tAuto:true});ccSave()};
 ['bg1','bg2','a1','a2','tx'].forEach((k,i)=>$('#c'+(i+1)).oninput=e=>ccPick(k,e.target.value));
 $('#cau').onchange=e=>{if(e.target.checked){if(CC.mode=='custom')CC.tAuto=true;ccSave()}else ccPick('tx',cardCols().title)};
+function edCard(){if(!lastCard)return;lastCard[0]=$('#et').value;lastCard[1]=$('#es').value;lastCard[2]=$('#eb').value;lastCard[4]=1;rr()}
+['#et','#es','#eb'].forEach(q=>$(q).oninput=edCard);
 
 let cardList=[];
-async function cardImg(title,sub,body,fn,raw,quiet){lastCard=[title,sub,body,fn,raw];
+const dirOf=t=>{const m=t.match(/[\u0590-\u08FFA-Za-z]/);return m&&/[A-Za-z]/.test(m[0])?'ltr':'rtl'};
+const rr2=(x,a,b,w,h,r)=>{x.beginPath();x.roundRect?x.roundRect(a,b,w,h,r):x.rect(a,b,w,h)};
+function parseCard(body){
+ const B=[];let o=null,m;
+ for(let ln of body.split('\n')){
+  let d=null;if(m=ln.match(/^\s*\[([LR])\]\s?/)){d=m[1]=='L'?'ltr':'rtl';ln=ln.slice(m[0].length)}
+  if(!ln.trim()){o=null;if(B.length&&B[B.length-1].k!='sp')B.push({k:'sp'});continue}
+  let k=null;
+  if(m=ln.match(/^\s*(?:س|Q)\s*[:：]\s?/))k='q';else if(m=ln.match(/^\s*(?:ج|A)\s*[:：]\s?/))k='a';else if(m=ln.match(/^\s*\[!\]\s?/))k='n';
+  if(k){ln=ln.slice(m[0].length);o={k,d,L:[]};B.push(o);if(ln.trim())o.L.push(ln);continue}
+  if(o){if(d&&!o.d)o.d=d;o.L.push(ln)}else B.push({k:'p',d,L:[ln]});
+ }
+ return B;
+}
+async function cardImg(title,sub,body,fn,raw,quiet){
+ if(!quiet){body=raw?body:unlatex(body);raw=1;$('#et').value=title;$('#es').value=sub;$('#eb').value=body}
+ lastCard=[title,sub,body,fn,raw];
  const FN=FNAME();try{await document.fonts.load(`700 30px "${FN}"`)}catch{}
- const W=1080,P=72,LH=62,MAX=24,F=(z,w=400)=>`${w} ${z}px "${FN}",Tahoma,sans-serif`,m=document.createElement('canvas').getContext('2d');
- m.direction='rtl';m.font=F(34);
- const paras=(raw?body:unlatex(body)).split('\n').map(par=>{const L=[];let l='';par.split(' ').forEach(w=>{const t=l?l+' '+w:w;if(m.measureText(t).width>W-2*P&&l){L.push(l);l=w}else l=t});L.push(l);return L});
- const pages=[[]];let n=0;
- paras.forEach(p=>{if(n+p.length>MAX&&n>0&&p.length<=MAX){pages.push([]);n=0}p.forEach(l=>{if(n==0&&!l.trim())return;if(n>=MAX){pages.push([]);n=0}pages[pages.length-1].push(l);n++})});
- const pgs=pages.filter(q=>q.length);
- const C=cardCols();
- cardList=(pgs.length?pgs:[[]]).map((L,i,a)=>{
-  const H=Math.max(720,340+L.length*LH+110),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+ const W=1080,P=72,LH=62,MAXH=1500,BP=26,BI=30,F=(z,w=400)=>`${w} ${z}px "${FN}",Tahoma,sans-serif`,m=document.createElement('canvas').getContext('2d');
+ const C=cardCols(),boxed=$('#qaBox').checked,Lt=lum(C.bg1)>.6,LB={q:['السؤال','Question'],a:['الجواب','Answer'],n:['ملاحظة هامة','Important note']};
+ const col={q:C.a2,a:Lt?'#047857':'#10b981',n:Lt?'#b45309':'#f59e0b'};
+ const items=[];
+ parseCard(raw?body:unlatex(body)).forEach(bk=>{
+  if(bk.k=='sp'){items.push({k:'sp'});return}
+  const d=bk.d||dirOf(bk.L.join(' ')),bx=bk.k=='n'||(bk.k!='p'&&boxed),w=W-2*P-(bx?2*BI:0),L=[];
+  m.direction=d;m.font=F(34);
+  bk.L.forEach(par=>{let l='';par.split(' ').forEach(w2=>{const t=l?l+' '+w2:w2;if(m.measureText(t).width>w&&l){L.push(l);l=w2}else l=t});L.push(l)});
+  const pv=[...items].reverse().find(t=>t.k!='sp');
+  items.push({k:bk.k,d,L,bx,sep:bk.k=='a'&&!boxed&&!!pv&&pv.k=='q'});
+ });
+ const out=[];
+ items.forEach(t=>{
+  if(t.k=='sp'){t.h=22;out.push(t);return}
+  const tg=t.k!='p';t.lab=tg?56:0;t.pad=t.bx?2*BP:0;t.top=tg?(t.sep?36:16):0;t.bot=tg?16:0;
+  const mx=Math.max(1,Math.floor((MAXH-t.top-t.bot-t.lab-t.pad)/LH));
+  for(let i=0;i<t.L.length;i+=mx){const c={...t,L:t.L.slice(i,i+mx),sep:i?0:t.sep,top:i?16:t.top};c.h=c.top+c.lab+c.L.length*LH+c.pad+c.bot;out.push(c)}
+ });
+ const pgs=[[]];let u=0;
+ out.forEach(t=>{const cp=pgs[pgs.length-1];if(t.k=='sp'&&!cp.length)return;if(u+t.h>MAXH&&u>0){pgs.push([]);u=0;if(t.k=='sp')return}pgs[pgs.length-1].push(t);u+=t.h});
+ const pg2=pgs.filter(q=>q.length);
+ cardList=(pg2.length?pg2:[[]]).map((L,i,a)=>{
+  const used=L.reduce((s,t)=>s+t.h,0),H=Math.max(720,254+used+130),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
   const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,C.bg1);g.addColorStop(1,C.bg2);x.fillStyle=g;x.fillRect(0,0,W,H);
   const b=x.createLinearGradient(0,0,W,0);b.addColorStop(0,C.a1);b.addColorStop(1,C.a2);x.fillStyle=b;x.fillRect(0,0,W,14);
   x.direction='rtl';x.textAlign='right';
   x.fillStyle=C.sub;x.font=F(30,700);x.fillText(a.length>1?`${sub} · ${i+1}/${a.length}`:sub,W-P,120);
   x.fillStyle=C.title;let z=48;x.font=F(z,800);while(z>24&&x.measureText(title).width>W-2*P)x.font=F(z-=2,800);x.fillText(title,W-P,196);
-  x.fillStyle=C.body;x.font=F(34);L.forEach((l,j)=>x.fillText(l,W-P,300+j*LH));
-  x.fillStyle=C.foot;x.font=F(24);x.textAlign='center';x.fillText('Student Assistor',W/2,H-44);
+  let y=254;
+  L.forEach(t=>{
+   if(t.k=='sp'){y+=t.h;return}
+   const lt=t.d=='ltr',bs=t.bx?BI:0,tx=lt?P+bs:W-P-bs,y0=y+t.top,hh=t.lab+t.L.length*LH+t.pad;
+   x.direction=t.d;x.textAlign=lt?'left':'right';
+   if(t.sep){x.strokeStyle=C.foot;x.globalAlpha=.55;x.lineWidth=2;x.beginPath();x.moveTo(P,y+16);x.lineTo(W-P,y+16);x.stroke();x.globalAlpha=1}
+   if(t.bx){x.fillStyle=col[t.k]+'26';rr2(x,P,y0,W-2*P,hh,22);x.fill();x.fillStyle=col[t.k];rr2(x,lt?P:W-P-8,y0,8,hh,4);x.fill()}
+   let ty=y0+(t.bx?BP:0);
+   if(t.lab){x.fillStyle=col[t.k];x.font=F(28,700);x.fillText((t.k=='n'?'⚠ ':'')+LB[t.k][lt?1:0],tx,ty+38);ty+=56}
+   x.fillStyle=C.body;x.font=F(34);t.L.forEach((l,j)=>x.fillText(l,tx,ty+46+j*LH));
+   y+=t.h;
+  });
+  x.direction='rtl';x.fillStyle=C.foot;x.font=F(24);x.textAlign='center';x.fillText('Student Assistor',W/2,H-44);
   return{url:c.toDataURL('image/png'),name:`${fn}${a.length>1?'-'+(i+1):''}.png`}
  });
- const g=$('#cg');g.innerHTML='';
- cardList.forEach((cd,i)=>{const d=document.createElement('div');d.className='book';d.style.cursor='default';d.innerHTML='<img style="width:100%;border-radius:10px;border:1px solid var(--bd)"><button class="g" style="margin-top:10px;width:100%">⬇ تحميل</button>';d.querySelector('img').src=cd.url;d.querySelector('button').onclick=()=>dl(i);g.append(d)});
+ const gg=$('#cg');gg.innerHTML='';
+ cardList.forEach((cd,i)=>{const d=document.createElement('div');d.className='book';d.style.cursor='default';d.innerHTML='<img style="width:100%;border-radius:10px;border:1px solid var(--bd)"><button class="g" style="margin-top:10px;width:100%">⬇ تحميل</button>';d.querySelector('img').src=cd.url;d.querySelector('button').onclick=()=>dl(i);gg.append(d)});
  syncCC();M('mCards',1);if(cardList.length>1&&!quiet)toast(`قُسّم المحتوى إلى ${cardList.length} بطاقات 🖼`);
+}
+/* أدوات المحرر */
+$('#qaBox').checked=localStorage.QB=='1';$('#qaBox').onchange=e=>{localStorage.QB=+e.target.checked;rr()};
+function tagL(t){const e=$('#eb'),v=e.value,a=v.lastIndexOf('\n',e.selectionStart-1)+1;let z=v.indexOf('\n',e.selectionEnd);if(z<0)z=v.length;
+ const r=v.slice(a,z).split('\n').map(l=>l.trim()?(t?t+' ':'')+l.replace(/^\s*\[[LR]\]\s?/,''):l).join('\n');
+ e.value=v.slice(0,a)+r+v.slice(z);e.focus();e.setSelectionRange(a,a+r.length);edCard()}
+function ins(t){const e=$('#eb'),v=e.value,pre=v.slice(0,e.selectionStart),sel=v.slice(e.selectionStart,e.selectionEnd),post=v.slice(e.selectionEnd);
+ const A=!pre||pre.endsWith('\n\n')?'':pre.endsWith('\n')?'\n':'\n\n',B=post.startsWith('\n\n')?'':post.startsWith('\n')?'\n':'\n\n';
+ e.value=pre+A+t+sel+B+post;const c=(pre+A+t+sel).length;e.focus();e.setSelectionRange(c,c);edCard()}
+/* مكتبة الصور */
+async function saveGal(){if(!lastCard||!cardList.length)return;const[t,s2,b2,f]=lastCard;await put('imgs',{title:t,sub:s2,body:b2,fn:f,pages:cardList.map(c=>c.url),names:cardList.map(c=>c.name),date:Date.now()});toast('حُفظت في مكتبة الصور 🖼')}
+async function openGal(){
+ M('mGal',1);const g=$('#gl'),q=$('#gq').value.trim().toLowerCase();let l=(await all('imgs')).sort((p,r)=>r.date-p.date);
+ if(q)l=l.filter(x=>(x.title+x.sub+x.body).toLowerCase().includes(q));
+ g.innerHTML=l.length?'':'<p style="color:var(--mut)">'+(q?'لا توجد نتائج 🔎':'المكتبة فارغة. أنشئ بطاقة صورة ثم اضغط «حفظ في مكتبة الصور» 🖼')+'</p>';
+ l.forEach(x=>{const d=document.createElement('div');d.className='book';d.style.cursor='default';
+  d.innerHTML='<img style="width:100%;border-radius:10px;border:1px solid var(--bd)"><b></b><small></small><div class="row" style="justify-content:center;margin:8px 0 0"><button class="s">✏️</button><button class="g">⬇</button><button class="r">🗑</button></div>';
+  d.querySelector('img').src=x.pages[0];d.querySelector('b').textContent=x.title;d.querySelector('small').textContent=x.sub+(x.pages.length>1?` · ${x.pages.length} صور`:'');
+  const[e,w,r]=d.querySelectorAll('button');
+  e.onclick=()=>{M('mGal',0);cardImg(x.title,x.sub,x.body,x.fn,1)};
+  w.onclick=async()=>{for(let i=0;i<x.pages.length;i++){const k=document.createElement('a');k.href=x.pages[i];k.download=x.names[i];k.click();await sleep(450)}};
+  r.onclick=async()=>{await del('imgs',x.id);openGal()};g.append(d)})
 }
 function dl(i){const a=document.createElement('a');a.href=cardList[i].url;a.download=cardList[i].name;a.click()}
 async function dlAll(){for(let i=0;i<cardList.length;i++){dl(i);await sleep(450)}}
 function pack(w){
  const book=cur.name||'كتاب',pg=cur.n;
  if(w=='ex')return{t:$('#ex').dataset.t||'',kind:'شرح الصفحة',book,pg};
- const e=$('#rx').dataset.t;
- return e?{t:e,kind:'شرح جزء',book,pg}:{t:(selData.o?selData.o+'\n\n':'')+selData.t,kind:'جزء مترجم',book,pg};
+ const P=[],x=$('#rx').dataset.t;
+ if($('#kO').checked&&selData.o)P.push(['النص الأصلي',selData.o]);
+ if($('#kT').checked&&selData.t)P.push(['الترجمة',selData.t]);
+ if($('#kX').checked&&x)P.push(['الشرح',x]);
+ return{t:P.length==1?P[0][1]:P.map(([h,v])=>'## '+h+'\n'+v).join('\n\n'),kind:'جزء · '+P.map(p=>p[0]).join(' + '),book,pg};
 }
 const pdfBody=(o,sub)=>`<h2>${esc(o.kind)}</h2><p style="color:#666">${esc(sub)}</p><div style="white-space:pre-wrap;line-height:2">${md(o.t)}</div>`;
 async function act(a,w){
- const o=pack(w);if(!o.t.trim())return toast('لا يوجد محتوى بعد');const sub=`${o.book} · صفحة ${o.pg}`;
+ const o=pack(w);if(!o.t.trim())return toast(w=='res'?'اختر عنصراً له محتوى (الشرح يحتاج ضغط «شرح» أولاً)':'لا يوجد محتوى بعد');const sub=`${o.book} · صفحة ${o.pg}`;
  if(a=='copy'){await navigator.clipboard.writeText(unlatex(plain(o.t)));toast('تم النسخ 📋')}
  else if(a=='img')cardImg(o.kind,sub,plain(o.t),o.book+'-p'+o.pg);
  else if(a=='pdf')printHTML(o.kind,pdfBody(o,sub));
