@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مصمم بطاقات الآيات والأحاديث</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zain:wght@400;700;800&family=IBM+Plex+Sans+Arabic:wght@400;700&family=Almarai:wght@400;700&family=Cairo:wght@400;700&family=Lateef:wght@400;700&family=Scheherazade+New:wght@400;700&family=Parastoo:wght@400;700&family=Alyamama:wght@400;700&family=Amiri:wght@400;700&family=Amiri+Quran&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{--bg:#0f1226;--pn:#161b3d;--ln:#2a3070;--fg:#eef0ff;--mu:#8f97c9;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:Zain,system-ui,sans-serif;font-size:17px}
+.app{display:grid;grid-template-columns:minmax(330px,460px) 1fr;gap:16px;padding:14px;max-width:1500px;margin:auto}
+@media(max-width:900px){.app{grid-template-columns:1fr}}
+.pn{background:var(--pn);border:1px solid var(--ln);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;align-self:start}
+h1{font-size:23px;margin:0}h2{font-size:18px;margin:0}
+label{font-size:14px;color:var(--mu);display:block;margin-bottom:3px}
+input[type=text],input[type=password],textarea,select,input[type=number]{width:100%;background:#12163a;color:var(--fg);border:1px solid var(--ln);border-radius:10px;padding:8px 10px;font:inherit}
+textarea{min-height:72px;resize:vertical;line-height:1.7}
+.r{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}.r>*{flex:1;min-width:100px}
+input[type=color]{width:40px;height:32px;border:1px solid var(--ln);border-radius:8px;background:#12163a;padding:2px;cursor:pointer}
+button{font:inherit;cursor:pointer;border:1px solid var(--ln);background:#12163a;color:var(--fg);border-radius:10px;padding:8px 12px}
+button.go{background:linear-gradient(135deg,#10b981,#059669);border:0;font-weight:700}
+button.ai{font-size:14px;padding:5px 10px;color:#a5b4fc;margin-top:6px}
+button:disabled{opacity:.5;cursor:wait}
+.hint{font-size:13px;color:var(--mu);line-height:1.6}
+details.sc{border:1px solid var(--ln);border-radius:12px;padding:8px 10px;background:#12163a55}
+details.sc>summary{cursor:pointer;font-weight:700}
+.orr{display:flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid var(--ln);border-radius:10px;margin-bottom:6px;background:#12163a;cursor:grab}.orr span{flex:1}.orr.e{opacity:.45}.orr button{padding:2px 12px;font-size:16px}.orr.dg{outline:2px dashed #10b981}
+details.sc>div{margin-top:8px}
+.sty{display:flex;flex-wrap:wrap;gap:8px;font-size:13px;color:var(--mu);align-items:center;border-top:1px dashed var(--ln);padding-top:8px;margin-top:8px}
+.sty span{display:flex;align-items:center;gap:4px}.sty input[type=number]{width:62px}.sty select{width:auto}
+.cols{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--mu);text-align:center}
+#pv{background:var(--pn);border:1px solid var(--ln);border-radius:18px;padding:12px;align-self:start;display:flex;flex-direction:column;gap:12px}
+#wrap{position:relative;width:100%;overflow:hidden}
+#stage{width:1080px;position:absolute;top:0;right:0;transform-origin:top right;display:flex;flex-direction:column;gap:40px}
+.lib{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.li{border:1px solid var(--ln);border-radius:12px;padding:8px;font-size:13px;display:flex;flex-direction:column;gap:6px}
+.li img{width:100%;border-radius:8px;aspect-ratio:3/4;object-fit:cover;object-position:top}
+.li div{display:flex;gap:4px}.li button{flex:1;padding:4px;font-size:13px}
+/* البطاقة */
+.card{width:1080px;padding:74px 64px 130px;position:relative;direction:rtl;display:flex;flex-direction:column;gap:26px;overflow:hidden}
+.it{position:relative;z-index:1}
+.fr{position:absolute;inset:22px;border:2px solid;border-radius:34px;opacity:.45;pointer-events:none}
+.sx{text-align:right;line-height:1.9}
+.sx.c{text-align:center}
+.lb{font-weight:800;font-size:.8em;margin-bottom:6px}
+.v{font-family:"Amiri Quran",serif;color:var(--vr)}
+.wd{display:flex;gap:12px;margin-bottom:6px}.wd b{white-space:nowrap}
+.sx ol{margin:0;padding-right:36px}
+.sig{position:absolute;z-index:2;bottom:62px;left:130px;right:130px;text-align:center;font-size:24px;opacity:.75}
+.pg{position:absolute;z-index:2;left:44px;bottom:40px;width:68px;height:68px;border:3px solid;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700}
+.orn{position:absolute;pointer-events:none}
+.dvh{display:flex;align-items:center;gap:14px;width:440px;max-width:100%;margin:16px auto 0}
+.dvh i{flex:1;height:3px;background:currentColor;border-radius:2px}
+.dvh u{display:block;box-sizing:border-box;position:relative;flex:none;text-decoration:none;border:3px solid currentColor}
+.dvh u.st{width:24px;height:24px}
+.dvh u.st s{position:absolute;inset:-3px;border:3px solid currentColor;transform:rotate(45deg);display:block;text-decoration:none}
+.dvh u.d{width:16px;height:16px;transform:rotate(45deg)}
+.dvh u.o{width:14px;height:14px;border-radius:50%}
+.dvh u.f{background:currentColor;width:22px;height:22px}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="pn" id="ctl">
+  <h1>🖼️ بطاقات الآيات والأحاديث</h1>
+
+  <details class="sc"><summary>🤖 الذكاء الاصطناعي</summary><div>
+    <label>المزوّد</label>
+    <select id="prov"><option value="claude">Claude (مدمج)</option><option value="gemini">Gemini (مفتاحك)</option></select>
+    <div id="gem" style="display:none;margin-top:8px">
+      <label>مفتاح Gemini API (يُحفظ في متصفحك فقط)</label><input type="password" id="gk" autocomplete="off">
+      <label style="margin-top:6px">النموذج</label><input type="text" id="gm" value="gemini-2.5-flash">
+      <div class="hint">⚠️ داخل الصفحة المنشورة على claude.ai يُحجب الاتصال بـ Google، فيعمل Gemini عند فتح الملف على جهازك أو استضافته في موقعك.</div>
+    </div>
+  </div></details>
+
+  <details class="sc" open><summary>🎨 الألوان والخط والتقسيم</summary><div>
+    <div class="r"><div><label>الثيم</label><select id="theme">
+      <option value="dark">داكن</option><option value="green">أخضر داكن</option><option value="paper">ورقي</option><option value="white">أبيض</option></select></div>
+      <div><label>خط البطاقة</label><select id="gf"></select></div></div>
+    <div class="cols" id="cols" style="margin-top:8px"></div>
+    <div class="r" style="margin-top:8px">
+      <button id="pal">✨ ألوان بالذكاء الاصطناعي</button><button id="rnd">🎲 عشوائي</button></div>
+    <div class="r" style="margin-top:8px">
+      <div><label>عدد الشرائح</label><input type="number" id="nn" min="1" max="6" value="1"></div>
+      <button id="spl">✂️ تقسيم بالذكاء الاصطناعي</button></div>
+    <div class="r" style="margin-top:8px"><div><label>زخرفة الخلفية</label><select id="orn"><option value="both">نجوم وأركان ملكية</option><option value="star">نجوم هندسية</option><option value="corner">أركان ملكية</option><option value="none">بدون</option></select></div>
+      <div><label>شفافية الزخرفة</label><input type="range" id="oop" min="3" max="30" value="12" style="width:100%"></div></div>
+    <div class="r" style="margin-top:8px"><div><label>الفاصل الإسلامي</label><select id="dvs"><option value="1">نجمة ثمانية</option><option value="2">معيّنات</option><option value="3">دوائر</option></select></div>
+      <div><label>ارتفاع الشريحة</label><select id="ph"><option value="1350">1080×1350 (4:5)</option><option value="1080">1080×1080 (1:1)</option><option value="1920">1080×1920 (9:16)</option><option value="0">تلقائي (بلا تقسيم)</option></select></div></div>
+    <label style="margin-top:8px"><input type="checkbox" id="pgn" checked> ترقيم الصفحات (دائرة أسفل اليسار، تظهر فقط مع أكثر من صفحة)</label>
+    <div class="hint">ما زاد عن ارتفاع الشريحة ينتقل تلقائياً لشريحة جديدة. والتقسيم اليدوي باختيار «شريحة» لكل قسم.</div>
+  </div></details>
+
+  <details class="sc" open><summary>↕️ ترتيب الصناديق</summary><div id="ordl"></div><div class="hint" style="margin-top:6px">اسحب الصندوق أو استخدم الأسهم (تقفز فوق الأقسام الفارغة).</div></details>
+  <div id="secs"></div>
+
+  <div><label>توقيع أسفل البطاقة</label><input type="text" id="sig"></div>
+  <div class="hint" id="st"></div>
+</div>
+
+<div id="pv">
+  <div id="wrap"><div id="stage"></div></div>
+  <div class="r" id="dls"></div>
+  <button class="go" id="save">💾 حفظ في مكتبة الصور</button>
+  <h2>🗂️ مكتبة الصور</h2>
+  <div class="lib" id="lib"></div>
+</div>
+</div>
+
+<div id="meas" style="position:absolute;visibility:hidden;left:-9999px;top:0;width:952px;direction:rtl"></div>
+<script>
+const $=id=>document.getElementById(id);
+const FONTS=["Zain","IBM Plex Sans Arabic","Almarai","Cairo","Lateef","Scheherazade New","Parastoo","Alyamama","Amiri","Amiri Quran"];
+const THEMES={
+ dark:{bg:"#0f1226",fg:"#f1f5f9",acc:"#06b6d4",had:"#60a5fa",ver:"#34d399"},
+ green:{bg:"#07261f",fg:"#ecfdf5",acc:"#fbbf24",had:"#7dd3fc",ver:"#4ade80"},
+ paper:{bg:"#f6efe0",fg:"#2b2417",acc:"#9a6b1f",had:"#1d4ed8",ver:"#047857"},
+ white:{bg:"#ffffff",fg:"#111827",acc:"#0e7490",had:"#1d4ed8",ver:"#047857"}};
+const COLS=[["bg","الخلفية"],["fg","النص"],["acc","التمييز"],["had","الحديث"],["ver","الآية"]];
+const SEC=[
+["title","🏷️ العنوان",[["title","","i"]]],
+["had","📜 الحديث وراويه",[["nar","الراوي","i"],["had","نص الحديث","t"]]],
+["ver","🌿 الآية ومرجعها",[["ver","الآية (الرسم العثماني)","t"],["vref","المرجع","i"]]],
+["bio","👤 التعريف بالراوي",[["bio","","t"]],"bio"],
+["exp","📖 الشرح",[["exp","","t"]],"exp"],
+["voc","🔤 شرح المفردات",[["voc","سطر لكل كلمة ← كلمة: معناها","t"]],"voc"],
+["vw","🌱 شرح كلمات الآية",[["vw","سطر لكل كلمة ← كلمة: معناها","t"]],"vw"],
+["ben","💡 الفوائد",[["ben","سطر لكل فائدة","t"]],"ben"],
+["ref","📚 المرجع",[["ref","","i"]]]];
+const DEF={title:"فضائل الصحابة الكرام وأمهات المؤمنين",nar:"عن أبي سعيد الخدري -رضي الله عنه-",had:"قال: قال النبي صلى الله عليه وسلم: لا تسبوا أصحابي؛ فلو أن أحدكم أنفق مثل أُحُدٍ ذهباً، ما بلغ مُدَّ أحدهم ولا نصيفه",ver:"ٱلنَّبِىُّ أَوْلَىٰ بِٱلْمُؤْمِنِينَ مِنْ أَنفُسِهِمْ ۖ وَأَزْوَٰجُهُۥٓ أُمَّهَٰتُهُمْ",vref:"الأحزاب: 6",bio:"أبو سعيد الخدري رضي الله عنه هو سعد بن مالك بن سنان الأنصاري الخزرجي، أحد أبرز صغار الصحابة، ومن المكثرين من رواية الحديث النبوي الشريف، ومن فقهاء الصحابة وعلمائهم.\nيُعد سابع المكثرين من رواية الحديث عن النبي صلى الله عليه وسلم، وله في كتب الحديث (1170 حديثاً).\nتوفي بالمدينة المنورة سنة 74 هـ (وقيل 64 هـ)، ودفن في مقبرة البقيع.",voc:"مد: مقياس قديم ويعادل ملء كفَّي الرجل\nنصيفه: نصفه",ref:"رواه البخاري (3673) ومسلم (2541) باختلاف يسير",sig:"تجربة"};
+const IDS=["title","nar","had","ver","vref","bio","exp","voc","vw","ben","ref","sig"];
+const EX=["orn","oop","dvs","ph","pgn"];
+const cur={};let N=1,gf="Zain";
+const st={title:{box:0,sz:64,ft:"Amiri",sl:1,dv:1},had:{box:1,sz:50,ft:"Amiri",sl:1},ver:{box:1,sz:54,ft:"Amiri Quran",sl:1},
+ bio:{box:1,sz:34,ft:"",sl:1},exp:{box:1,sz:34,ft:"",sl:1},voc:{box:1,sz:34,ft:"",sl:1},vw:{box:1,sz:34,ft:"",sl:1},ben:{box:1,sz:34,ft:"",sl:1},ref:{box:1,sz:28,ft:"",sl:1}};
+
+const LZ={had:32,ver:28,ref:26},LH={title:1.5,had:2.05,ver:2.3,ref:1.8};
+for(const k in st){st[k].lz=LZ[k]||30;st[k].lh=LH[k]||1.9}
+let ord=SEC.map(x=>x[0]);
+/* ألوان */
+const h2r=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const mix=(a,b,t)=>"#"+h2r(a).map((x,i)=>Math.round(x+(h2r(b)[i]-x)*t).toString(16).padStart(2,"0")).join("");
+const hx=(h,s,l)=>{h=((h%360)+360)%360;s/=100;l/=100;const a=s*Math.min(l,1-l),f=n=>{const k=(n+h/30)%12;return Math.round(255*(l-a*Math.max(-1,Math.min(k-3,9-k,1))))};return"#"+[f(0),f(8),f(4)].map(x=>x.toString(16).padStart(2,"0")).join("")};
+function applyColors(){
+  const D={title:[cur.acc,cur.acc],had:[cur.had,cur.had],ver:[cur.ver,cur.ver],bio:[cur.had,cur.fg],exp:[cur.acc,cur.fg],voc:[cur.acc,cur.fg],vw:[cur.ver,cur.fg],ben:[cur.acc,cur.fg],ref:[cur.acc,cur.fg]};
+  for(const k in D){st[k].bg=cur.box;st[k].bd=D[k][0];st[k].tx=D[k][1]}
+}
+function after(){COLS.forEach(([k])=>$("c_"+k).value=cur[k]);applyColors();sync();render()}
+function setPalette(p){Object.assign(cur,p);if(!p.box)cur.box=mix(cur.bg,cur.fg,.07);after()}
+const OK=/^#[0-9a-f]{6}$/i;
+
+/* واجهة */
+const fopts=FONTS.map(f=>`<option>${f}</option>`).join("");
+$("gf").innerHTML=fopts;
+$("cols").innerHTML=COLS.map(([k,n])=>`<div><input type="color" id="c_${k}"><br>${n}</div>`).join("");
+$("secs").innerHTML=SEC.map(([k,n,f,a])=>`<details class="sc" data-sec="${k}"><summary>${n}</summary><div>
+ ${f.map(([id,l,t])=>`<div>${l?`<label>${l}</label>`:""}${t=="t"?`<textarea id="${id}"></textarea>`:`<input type="text" id="${id}">`}</div>`).join("")}
+ ${a?`<button class="ai" data-ai="${a}">✨ كتابة بالذكاء الاصطناعي</button>`:""}
+ <div class="sty"><label style="margin:0"><input type="checkbox" data-k="${k}" data-p="box"> صندوق</label>
+ ${[["bg","خلفية"],["bd","إطار"],["tx","نص"]].map(([p,l])=>`<span>${l}<input type="color" data-k="${k}" data-p="${p}"></span>`).join("")}
+ <span>حجم<input type="number" min="14" max="140" data-k="${k}" data-p="sz"></span>
+ <span>خط<select data-k="${k}" data-p="ft"><option value="">تلقائي</option>${fopts}</select></span>
+ <span>شريحة<select data-k="${k}" data-p="sl"></select></span>${k=="title"?"":`<span>حجم العنوان<input type="number" min="12" max="100" data-k="${k}" data-p="lz"></span>`}<span>تباعد الأسطر<input type="number" step="0.1" min="1" max="4" data-k="${k}" data-p="lh"></span><label style="margin:0"><input type="checkbox" data-k="${k}" data-p="dv"> فاصل</label></div></div></details>`).join("");
+IDS.forEach(i=>{if($(i))$(i).value=DEF[i]||""});
+function buildSl(){document.querySelectorAll('select[data-p="sl"]').forEach(s=>{s.innerHTML=Array.from({length:N},(_,i)=>`<option>${i+1}</option>`).join("")});
+  for(const k in st)st[k].sl=Math.min(st[k].sl,N);sync()}
+function sync(){document.querySelectorAll("[data-p]").forEach(e=>{const v=st[e.dataset.k][e.dataset.p];if(e.type=="checkbox")e.checked=!!v;else e.value=v})}
+document.addEventListener("input",e=>{
+  const t=e.target,p=t.dataset&&t.dataset.p;
+  if(p){const k=t.dataset.k;st[k][p]=t.type=="checkbox"?t.checked:["sz","sl","lz","lh"].includes(p)?+t.value:t.value}
+  else if(t.id=="theme"){setPalette(THEMES[t.value]);return}
+  else if(t.id.startsWith("c_")){cur[t.id.slice(2)]=t.value;if(t.id=="c_bg"||t.id=="c_fg")cur.box=mix(cur.bg,cur.fg,.07);after();return}
+  else if(t.id=="gf")gf=t.value;
+  else if(t.id=="nn"){N=Math.max(1,Math.min(6,+t.value||1));buildSl()}
+  else if(t.id=="prov")$("gem").style.display=t.value=="gemini"?"block":"none";
+  else if(t.id=="gk"){try{localStorage.setItem("gk",t.value)}catch(_){}}
+  render()});
+try{$("gk").value=localStorage.getItem("gk")||""}catch(_){}
+
+function applyOrder(){ord.forEach(k=>$("secs").appendChild(document.querySelector(`details[data-sec="${k}"]`)))}
+const moveTo=(k,to)=>{ord.splice(ord.indexOf(k),1);ord.splice(to,0,k);applyOrder();render()};
+document.addEventListener("click",e=>{const b=e.target.closest("[data-mv]");if(!b)return;
+  const k=b.dataset.k,d=+b.dataset.mv;let j=ord.indexOf(k)+d;
+  while(j>=0&&j<ord.length&&!secHTML(ord[j]))j+=d;
+  if(j<0)j=0;if(j>=ord.length)j=ord.length-1;
+  moveTo(k,j)});
+function renderOrd(){
+  $("ordl").innerHTML=ord.map(k=>{const n=SEC.find(x=>x[0]==k)[1];
+    return`<div class="orr ${secHTML(k)?"":"e"}" draggable="true" data-o="${k}">☰<span>${n}</span><button data-mv="-1" data-k="${k}">▲</button><button data-mv="1" data-k="${k}">▼</button></div>`}).join("");
+}
+let dragK=null;
+$("ordl").addEventListener("dragstart",e=>{const r=e.target.closest("[data-o]");if(r){dragK=r.dataset.o;e.dataTransfer.setData("text/plain",dragK)}});
+$("ordl").addEventListener("dragover",e=>{if(dragK)e.preventDefault()});
+$("ordl").addEventListener("drop",e=>{e.preventDefault();const r=e.target.closest("[data-o]");if(r&&dragK&&r.dataset.o!=dragK)moveTo(dragK,ord.indexOf(r.dataset.o));dragK=null});
+/* تنسيق النص */
+const esc=s=>(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const D="[\\u064B-\\u0652\\u0670]*";
+const wd=w=>[...w].map(c=>(c=="ى"?"[ىي]":c)+D).join("");
+const SAW=new RegExp(["صلى","الله","عليه","وسلم"].map(wd).join("\\s*"),"g");
+const SAW2=new RegExp(["صلى","الله","عليه","وآله","وسلم"].map(wd).join("\\s*"),"g");
+const QM=/[\u0670\u0671\u06D6-\u06ED]/,DIA=/[\u064B-\u0652]/g,LET=/[\u0621-\u064A]/g;
+const vowel=w=>{const l=(w.match(LET)||[]).length,d=(w.match(DIA)||[]).length;return l>1&&d>=l-1};
+function autoV(t){
+  const p=t.split(/(\s+)/),ix=[],m={};
+  p.forEach((w,i)=>{if(i%2==0&&w){ix.push(i);m[i]=QM.test(w)}});
+  const q=ix.filter(i=>m[i]);
+  for(let a=0;a<q.length-1;a++){const A=ix.indexOf(q[a]),B=ix.indexOf(q[a+1]);if(B-A<=3)for(let x=A+1;x<B;x++)m[ix[x]]=true}
+  if(!q.length)return t;
+  [ix,[...ix].reverse()].forEach(o=>{for(let n=1;n<o.length;n++)if(!m[o[n]]&&m[o[n-1]]&&vowel(p[o[n]]))m[o[n]]=true});
+  let out="",i=0;
+  while(i<p.length){
+    if(i%2==0&&p[i]&&m[i]){let j=i;while(j+2<p.length&&p[j+2]&&m[j+2])j+=2;out+=`<span class="v">${p.slice(i,j+1).join("")}</span>`;i=j+1}
+    else{out+=p[i];i++}}
+  return out;
+}
+const vs=s=>s.split(/(﴿[^﴾]*﴾)/).map((x,i)=>i%2?`<span class="v">${x}</span>`:autoV(x)).join("").replace(/\n/g,"<br>");
+const saw=s=>esc(s).replace(SAW2,"ﷺ").replace(SAW,"ﷺ").replace(/\s*\(?\s*ﷺ\s*\)?\s*/g," ﷺ ").replace(/ ﷺ\s+([:：،,.؛])/g," ﷺ$1").replace(/ {2,}/g," ").trim();
+const fmt=s=>vs(saw(s));
+function hadF(raw){
+  const s=saw(raw),i=s.indexOf("ﷺ");
+  if(i<0)return vs("“"+s+"”");
+  let pre=s.slice(0,i+1),rest=s.slice(i+1);
+  const m=rest.match(new RegExp("^\\s*(?:(?:قال|يقول|فقال|وقال)"+D+")?\\s*[:：،,]?"));
+  if(m&&m[0].trim()){pre+=m[0].trimEnd();rest=rest.slice(m[0].length)}
+  if(!rest.trim())return vs(s);
+  return vs(pre+" “"+rest.trim()+"”");
+}
+const lines=s=>(s||"").split("\n").map(x=>x.trim()).filter(Boolean);
+const words=(s,c)=>lines(s).map(l=>{const i=l.search(/[:：]/);return i<0?`<div class="wd">${fmt(l)}</div>`:`<div class="wd"><b style="color:${c}">${fmt(l.slice(0,i))}:</b><span>${fmt(l.slice(i+1))}</span></div>`}).join("");
+
+/* الأقسام */
+const val=id=>$(id).value.trim();
+function secHTML(k,n){
+  const s=st[k],lb=t=>`<div class="lb" style="color:${s.bd};font-size:${s.lz}px">${t}</div>`;
+  let h="",c=0;
+  if(k=="title"&&val("title")){h=fmt(val("title"));c=1}
+  else if(k=="had"&&(val("had")||val("nar"))){c=1;
+    h=(val("nar")?`<div style="font-size:${s.lz}px;color:${s.bd};margin-bottom:6px">${fmt(val("nar"))}</div>`:"")+(val("had")?`<div>${hadF(val("had"))}</div>`:"")}
+  else if(k=="ver"&&val("ver")){c=1;h=`<div>﴿ ${esc(val("ver").replace(/[﴿﴾]/g,""))} ﴾</div>`+(val("vref")?`<div style="font-size:${s.lz}px;opacity:.85">[${fmt(val("vref"))}]</div>`:"")}
+  else if(k=="bio"&&val("bio"))h=lb("👤 التعريف بالراوي")+fmt(val("bio"));
+  else if(k=="exp"&&val("exp"))h=lb("📖 الشرح")+fmt(val("exp"));
+  else if(k=="voc"&&val("voc"))h=lb("🔤 شرح المفردات")+words(val("voc"),s.bd);
+  else if(k=="vw"&&val("vw"))h=lb("🌱 شرح كلمات الآية")+words(val("vw"),s.bd);
+  else if(k=="ben"&&val("ben"))h=lb("💡 الفوائد")+"<ol>"+lines(val("ben")).map(x=>`<li>${fmt(x)}</li>`).join("")+"</ol>";
+  else if(k=="ref"&&val("ref")){c=1;h=lb("المرجع")+fmt(val("ref"))}
+  if(!h)return"";
+  const ff=s.ft||gf;
+  const bx=s.box?`background:${s.bg};border:3px ${k=="ref"?"dashed":"solid"} ${s.bd};border-radius:28px;padding:26px 34px;`:"";
+  return`<div class="sx ${c?"c":""}" style="color:${s.tx};font-size:${s.sz}px;line-height:${s.lh};font-family:'${ff}',serif;${bx}">${h}</div>`;
+}
+let pages=[];
+const item=k=>{const h=secHTML(k);return h?`<div class="it">${h}${st[k].dv?dvSVG(st[k].bd):""}</div>`:""};
+function dvSVG(c){
+  const v=$("dvs").value,u=v=="2"?"d":"o",b=`<div class="dvh" style="color:${c}">`;
+  if(v=="2"||v=="3")return`${b}<i></i><u class="${u}"></u><u class="${u} f"></u><u class="${u}"></u><i></i></div>`;
+  return`${b}<i></i><u class="st"><s></s></u><i></i></div>`;
+}
+const svgU=x=>"data:image/svg+xml,"+encodeURIComponent(x);
+function ornHTML(){
+  const s=$("orn").value,c=cur.acc,o=$("oop").value/100,X='xmlns="http://www.w3.org/2000/svg"';let h="";
+  if(s=="star"||s=="both"){
+    const t=`<svg ${X} width="110" height="110" viewBox="0 0 110 110"><g fill="none" stroke="${c}" stroke-width="2"><g transform="translate(55 55)"><rect x="-26" y="-26" width="52" height="52"/><rect x="-26" y="-26" width="52" height="52" transform="rotate(45)"/><circle r="10"/></g><path d="M0 0L14 14M110 0L96 14M0 110L14 96M110 110L96 96"/></g></svg>`;
+    h+=`<div class="orn" style="inset:0;opacity:${o};background:url('${svgU(t)}') 0 0/110px 110px repeat"></div>`;
+  }
+  if(s=="corner"||s=="both"){
+    const m=`<g fill="none" stroke="${c}" stroke-width="3"><path d="M8 192V62Q8 8 62 8H192"/><path d="M26 192V72Q26 26 72 26H192"/><path d="M100 8Q100 48 140 48M8 100Q48 100 48 140"/><g transform="translate(66 66)"><rect x="-24" y="-24" width="48" height="48"/><rect x="-24" y="-24" width="48" height="48" transform="rotate(45)"/><circle r="9" fill="${c}"/></g></g>`;
+    [["top:30px;left:30px",0,0],["top:30px;right:30px",1,0],["bottom:30px;left:30px",0,1],["bottom:30px;right:30px",1,1]].forEach(([p,fx,fy])=>{
+      const v=`<svg ${X} width="210" height="210" viewBox="0 0 200 200"><g transform="matrix(${fx?-1:1} 0 0 ${fy?-1:1} ${fx?200:0} ${fy?200:0})">${m}</g></svg>`;
+      h+=`<img class="orn" alt="" width="210" height="210" src="${svgU(v)}" style="${p};opacity:${Math.min(1,o*3)}">`});
+  }
+  return h;
+}
+function render(){
+  const H=+$("ph").value,ms=$("meas"),cap=H-204,list=[];
+  for(let p=1;p<=N;p++){
+    const its=ord.filter(k=>st[k].sl==p).map(item).filter(Boolean);
+    if(!H){if(its.length)list.push(its);continue}
+    let pg=[],sum=0;
+    for(const h of its){
+      ms.innerHTML=h;const hh=ms.firstChild.offsetHeight;
+      if(pg.length&&sum+hh+26>cap){list.push(pg);pg=[];sum=0}
+      sum+=(pg.length?26:0)+hh;pg.push(h)}
+    if(pg.length)list.push(pg);
+  }
+  pages=list.map((_,i)=>i+1);
+  $("stage").innerHTML=list.map((its,i)=>`<div class="card" style="background:${cur.bg};color:${cur.fg};font-family:'${gf}',serif;min-height:${H}px;--vr:${cur.ver}"><i class="fr" style="border-color:${cur.acc}"></i>${ornHTML()}${its.join("")}${val("sig")?`<div class="sig">${esc(val("sig"))}</div>`:""}${$("pgn").checked&&list.length>1?`<div class="pg" style="color:${cur.acc};background:${cur.bg}">${i+1}</div>`:""}</div>`).join("")||'<div class="card" style="color:#999">لا يوجد محتوى</div>';
+  $("dls").innerHTML=pages.map(p=>`<button data-dl="${p-1}">⬇ شريحة ${p}</button>`).join("")+(pages.length>1?'<button data-dl="all" class="go">⬇ الكل</button>':"");
+  renderOrd();
+  fit();
+}
+function fit(){const s=Math.min(1,($("pv").clientWidth-24)/1080);$("stage").style.transform=`scale(${s})`;$("wrap").style.height=($("stage").offsetHeight*s)+"px"}
+addEventListener("resize",fit);
+
+/* ذكاء اصطناعي */
+let sample=null;
+(async()=>{try{sample=await claude.use("sample")}catch(_){}
+  if(!sample){$("prov").value="gemini";$("gem").style.display="block"}})();
+async function gem(p,json){
+  const k=$("gk").value.trim();if(!k)throw new Error("أدخل مفتاح Gemini");
+  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent($("gm").value.trim()||"gemini-2.5-flash")}:generateContent?key=${encodeURIComponent(k)}`,
+   {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts:[{text:p}]}],generationConfig:json?{responseMimeType:"application/json"}:{}})});
+  const d=await r.json();if(!r.ok)throw new Error(d.error&&d.error.message||r.status);
+  return d.candidates[0].content.parts.map(x=>x.text||"").join("");
+}
+async function ai(p,json){
+  let t;
+  if($("prov").value=="gemini")t=await gem(p,json);
+  else{if(!sample)throw new Error("Claude غير متاح هنا");t=(await sample(p)).text}
+  return json?JSON.parse(t.replace(/```json|```/g,"").trim()):t.trim();
+}
+const msg=t=>$("st").textContent=t||"";
+async function run(btn,fn){const d=btn.disabled;btn.disabled=true;msg("جارٍ العمل…");
+  try{await fn();msg("تم — راجع المحتوى قبل النشر.")}catch(e){msg("تعذّر: "+(e.message||"خطأ في الاتصال"))}btn.disabled=d}
+const CTX=()=>`الحديث: ${val("had")}\nالآية: ${val("ver")}`;
+const PR={
+ bio:()=>`اكتب تعريفاً موجزاً جداً (سطران إلى ثلاثة) بالصحابي أو الراوي: «${val("nar")}». اذكر اسمه ونسبه وأبرز ما اشتهر به وسنة وفاته إن كنت متأكداً، ولا تذكر ما لا تتأكد منه. بالعربية الفصحى بلا مقدمات.`,
+ exp:()=>`اكتب شرحاً مختصراً (ثلاثة أسطر على الأكثر) بلغة سهلة وبما قرره أهل العلم، بلا مقدمات:\n${CTX()}`,
+ voc:()=>`استخرج ٣ إلى ٥ مفردات تحتاج بياناً من النص، كل مفردة في سطر بصيغة «الكلمة: معناها» بإيجاز، بلا مقدمات:\n${val("had")}`,
+ vw:()=>`اشرح باختصار ٢ إلى ٤ من كلمات الآية بحسب كتب التفسير والغريب، كل كلمة في سطر بصيغة «الكلمة: معناها»، بلا مقدمات:\n${val("ver")}`,
+ ben:()=>`استنبط ٣ إلى ٥ فوائد موجزة ودقيقة، كل فائدة في سطر واحد بلا ترقيم ولا مقدمات:\n${CTX()}\nالشرح: ${val("exp")}`};
+document.querySelectorAll("[data-ai]").forEach(b=>b.addEventListener("click",e=>{e.preventDefault();
+  run(b,async()=>{const k=b.dataset.ai;$(k).value=(await ai(PR[k]())).replace(/^[\d\-•\s.]+/gm,k=="ben"?"":"$&");render()})}));
+$("pal").onclick=e=>run(e.target,async()=>{
+  const p=await ai(`اقترح لوحة ألوان عشوائية فريدة ومتناسقة لبطاقة إسلامية (رقم عشوائي ${Math.random()}). أعد JSON فقط بالمفاتيح bg,fg,acc,had,ver,box بصيغة #rrggbb، بحيث يكون fg وhad وver واضحة القراءة على bg وعلى box، وhad مائل للأزرق وver مائل للأخضر.`,true);
+  const o={};["bg","fg","acc","had","ver","box"].forEach(k=>{if(OK.test(p[k]))o[k]=p[k]});
+  if(!o.bg||!o.fg)throw new Error("ردّ غير صالح");setPalette(o)});
+$("rnd").onclick=()=>{const h=Math.random()*360,dk=Math.random()>.35;
+  setPalette({bg:hx(h,40,dk?10:95),fg:hx(h,15,dk?94:12),acc:hx(h+180,70,dk?58:34),had:hx(215,80,dk?68:40),ver:hx(150,60,dk?56:28)})};
+$("spl").onclick=e=>run(e.target,async()=>{
+  const ks=SEC.filter(([k])=>secHTML(k)).map(([k])=>`${k}(${(secHTML(k).length)})`);
+  const r=await ai(`وزّع هذه الأقسام على ${N} شرائح مرتبة، بحيث تتوازن أطوالها ويبقى العنوان في الأولى والمرجع في الأخيرة والآية قرب الحديث. الأقسام (الرقم بين القوسين طولها): ${ks.join("، ")}. أعد JSON فقط على شكل {"اسم_القسم": رقم_الشريحة}.`,true);
+  for(const k in r)if(st[k])st[k].sl=Math.max(1,Math.min(N,+r[k]||1));sync();render()});
+
+/* تصدير */
+const cardEls=()=>[...document.querySelectorAll(".card")];
+async function shot(i,scale,type){
+  await document.fonts.ready;
+  const cv=await html2canvas(cardEls()[i],{scale,backgroundColor:cur.bg,useCORS:true,onclone:d=>{d.getElementById("stage").style.transform="none"}});
+  return type=="png"?await new Promise(r=>cv.toBlob(r,"image/png")):cv.toDataURL("image/jpeg",.85);
+}
+async function saveBlob(name,blob){
+  let d=null;try{d=await claude.use("downloads")}catch(_){}
+  if(d)return d.save({filename:name,data:blob});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();
+}
+const d2b=u=>{const b=atob(u.split(",")[1]),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return new Blob([a],{type:"image/jpeg"})};
+$("dls").addEventListener("click",e=>{const b=e.target.closest("[data-dl]");if(!b)return;
+  run(b,async()=>{const n=cardEls().length,idx=b.dataset.dl=="all"?[...Array(n).keys()]:[+b.dataset.dl];
+    for(const i of idx)await saveBlob(`card-${pages[i]||1}.png`,await shot(i,2,"png"))})});
+
+/* المكتبة */
+const DBO=()=>new Promise((res,rej)=>{const r=indexedDB.open("cardlib",1);r.onupgradeneeded=()=>r.result.createObjectStore("i",{keyPath:"id"});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+async function dbp(m,fn){const d=await DBO();return new Promise((res,rej)=>{const t=d.transaction("i",m),o=fn(t.objectStore("i"));t.oncomplete=()=>res(o&&o.result);t.onerror=()=>rej(t.error)})}
+const snap=()=>JSON.stringify({v:Object.fromEntries(IDS.map(i=>[i,$(i).value])),ex:Object.fromEntries(EX.map(i=>[i,$(i).type=="checkbox"?$(i).checked:$(i).value])),st,cur,gf,N,ord});
+async function loadLib(){
+  try{const items=(await dbp("readonly",s=>s.getAll())).sort((a,b)=>b.id-a.id);
+    $("lib").innerHTML=items.length?items.map(it=>`<div class="li" data-id="${it.id}"><img src="${it.imgs[0]}" alt=""><span>${esc(it.title||"بدون عنوان")} (${it.imgs.length})</span><div><button data-a="open">فتح</button><button data-a="get">تحميل</button><button data-a="del">حذف</button></div></div>`).join(""):'<div class="hint">المكتبة فارغة.</div>'}
+  catch(_){$("lib").innerHTML='<div class="hint">المكتبة غير متاحة في هذا المتصفح.</div>'}
+}
+$("save").onclick=e=>run(e.target,async()=>{
+  const imgs=[];for(let i=0;i<cardEls().length;i++)imgs.push(await shot(i,1,"jpg"));
+  await dbp("readwrite",s=>s.put({id:Date.now(),title:val("title"),imgs,snap:snap()}));await loadLib()});
+$("lib").addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;const id=+b.closest(".li").dataset.id;
+  run(b,async()=>{const it=await dbp("readonly",s=>s.get(id));
+    if(b.dataset.a=="del"){await dbp("readwrite",s=>s.delete(id));await loadLib()}
+    else if(b.dataset.a=="get"){for(let i=0;i<it.imgs.length;i++)await saveBlob(`card-${i+1}.jpg`,d2b(it.imgs[i]))}
+    else{const o=JSON.parse(it.snap);IDS.forEach(i=>$(i).value=o.v[i]||"");if(o.ex)EX.forEach(i=>{if($(i).type=="checkbox")$(i).checked=o.ex[i];else $(i).value=o.ex[i]});Object.assign(cur,o.cur);
+      for(const k in o.st)Object.assign(st[k],o.st[k]);gf=o.gf;$("gf").value=gf;N=o.N;if(o.ord){ord=o.ord;applyOrder()}$("nn").value=N;buildSl();COLS.forEach(([k])=>$("c_"+k).value=cur[k]);sync();render()}})});
+
+/* بدء */
+$("gf").value=gf;setPalette(THEMES.dark);buildSl();loadLib();
+if(document.fonts)document.fonts.ready.then(render);
+</script>
+</body>
+</html>
